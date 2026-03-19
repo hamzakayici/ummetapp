@@ -201,7 +201,7 @@ export default function NamazRehberiScreen() {
             <View style={{ marginHorizontal: 16, marginBottom: 8, padding: 14, borderRadius: 14, backgroundColor: "rgba(10,24,18,0.8)", borderWidth: 1, borderColor: "rgba(59,130,246,0.06)" }}>
               <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
                 <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(59,130,246,0.12)", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
-                  <Text style={{ fontSize: 20 }}>{item.emoji}</Text>
+                  <MaterialCommunityIcons name={item.icon} size={22} color="#3B82F6" />
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>

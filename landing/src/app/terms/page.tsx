@@ -16,7 +16,7 @@ export default function TermsPage() {
         <ul>
           <li>İçerikleri kopyalamak, değiştirmek veya ticari amaçla dağıtmak yasaktır</li>
           <li>Uygulamanın güvenliğini tehlikeye atacak girişimlerde bulunmak yasaktır</li>
-          <li>API&apos;leri kötüye kullanmak veya aşırı yükleme yapmak yasaktır</li>
+          <li>Uygulama hizmetlerini kötüye kullanmak veya aşırı yükleme yapmak yasaktır</li>
         </ul>
         <h2>4. İçerik</h2>
         <p>Kuran metinleri, dualar, hadisler güvenilir kaynaklardan derlenmiştir. Dini konularda alim görüşüne başvurmanız tavsiye edilir.</p>
@@ -27,7 +27,7 @@ export default function TermsPage() {
         <h2>7. Uygulanacak Hukuk</h2>
         <p>Bu kullanım şartları Türkiye Cumhuriyeti kanunlarına tabidir.</p>
         <h2>8. Değişiklikler</h2>
-        <p>Bu şartlar önceden bildirimde bulunulmaksızın değiştirilebilir. Güncel şartlar her zaman bu sayfadan erişilebilir olacaktır.</p>
+        <p>Bu şartlar önceden bildirimde bulunulmaksızın değiştirilebilir.</p>
         <h2>9. İletişim</h2>
         <p>Sorularınız için <a href="mailto:destek@ummetapp.com">destek@ummetapp.com</a> adresinden ulaşabilirsiniz.</p>
       </div>

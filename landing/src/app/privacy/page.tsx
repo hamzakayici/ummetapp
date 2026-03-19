@@ -13,17 +13,13 @@ export default function PrivacyPage() {
         <h2>2. Verilerin Kullanımı</h2>
         <p>Konum verisi yalnızca namaz vakitlerini hesaplamak, kıble yönünü belirlemek ve yakındaki camileri bulmak için kullanılır.</p>
         <h2>3. Verilerin Saklanması</h2>
-        <p>Tüm verileriniz (tercihler, ibadet takibi, okunan sureler, zikir sayıları) yalnızca cihazınızda yerel olarak (AsyncStorage) saklanır. Sunuculara kişisel veri aktarılmaz.</p>
+        <p>Tüm verileriniz (tercihler, ibadet takibi, okunan sureler, zikir sayıları) yalnızca cihazınızda yerel olarak saklanır. Sunuculara kişisel veri aktarılmaz.</p>
         <h2>4. Üçüncü Taraf Hizmetler</h2>
-        <ul>
-          <li><strong>Aladhan API:</strong> Namaz vakitleri — yalnızca koordinatlar gönderilir</li>
-          <li><strong>BigDataCloud API:</strong> Konum adı — yalnızca koordinatlar gönderilir</li>
-          <li><strong>OpenStreetMap Overpass API:</strong> Yakındaki camiler — yalnızca koordinatlar gönderilir</li>
-        </ul>
+        <p>Uygulama, namaz vakitleri hesaplama, konum belirleme ve yakındaki camileri bulma gibi işlevler için üçüncü taraf hizmetleri kullanır. Bu hizmetlere yalnızca konum koordinatları iletilir. Ad, e-posta gibi kişisel bilgiler paylaşılmaz.</p>
         <h2>5. Bildirimler</h2>
         <p>Namaz vakti bildirimleri kullanıcının izni ile yerel olarak planlanır. Bildirim verileri sunucuya gönderilmez.</p>
         <h2>6. Reklam ve İzleme</h2>
-        <p>Ümmet reklam içermez. Kullanıcı izleme, analitik veya reklam SDK&apos;ları kullanılmaz. IDFA toplanmaz.</p>
+        <p>Ümmet reklam içermez. Kullanıcı izleme, analitik veya reklam araçları kullanılmaz.</p>
         <h2>7. Çocukların Gizliliği</h2>
         <p>Uygulama tüm yaş grupları için uygundur ve çocuklardan bilerek kişisel bilgi toplamaz.</p>
         <h2>8. Veri Silme</h2>

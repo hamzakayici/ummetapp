@@ -23,13 +23,25 @@ export default function ContactScreen() {
     hapticNotification(NotificationFeedbackType.Success);
     setSending(true);
 
-    // Burada Supabase'e veya backend'e gönderebilirsiniz
-    setTimeout(() => {
+    try {
+      const res = await fetch("https://ummetapp.com/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject: subject.trim(), message: message.trim() }),
+      });
+
+      if (res.ok) {
+        Alert.alert("Gönderildi", "Mesajınız bize ulaştı. En kısa sürede dönüş yapacağız.", [
+          { text: "Tamam", onPress: () => router.back() },
+        ]);
+      } else {
+        Alert.alert("Hata", "Mesaj gönderilemedi. Lütfen tekrar deneyin.");
+      }
+    } catch {
+      Alert.alert("Bağlantı Hatası", "İnternet bağlantınızı kontrol edin ve tekrar deneyin.");
+    } finally {
       setSending(false);
-      Alert.alert("Gönderildi ✅", "Mesajınız bize ulaştı. En kısa sürede dönüş yapacağız.", [
-        { text: "Tamam", onPress: () => router.back() },
-      ]);
-    }, 1000);
+    }
   };
 
   const inputStyle = {

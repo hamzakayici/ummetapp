@@ -44,6 +44,7 @@ nav.scrolled { background: rgba(10,14,23,0.95); }
 .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; color: #fff; text-decoration: none; }
 .nav-logo span { color: var(--gold); }
+.logo-icon { color: var(--gold); }
 .nav-links { display: flex; gap: 28px; list-style: none; }
 .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s; }
 .nav-links a:hover { color: var(--gold); }
@@ -106,7 +107,7 @@ section { position: relative; z-index: 1; padding: 100px 24px; }
 /* ═══ TESTIMONIALS ═══ */
 .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 .testimonial { padding: 28px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.04); }
-.testimonial-stars { color: var(--gold); font-size: 14px; margin-bottom: 12px; }
+.testimonial-stars { color: var(--gold); font-size: 14px; margin-bottom: 12px; display: flex; gap: 3px; }
 .testimonial p { color: var(--text-dim); font-size: 14px; line-height: 1.7; font-style: italic; margin-bottom: 14px; }
 .testimonial-author { font-size: 13px; font-weight: 600; }
 
@@ -184,6 +185,97 @@ footer { position: relative; z-index: 1; padding: 60px 24px 30px; border-top: 1p
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+}
+
+/* ═══ TOOL COMPONENTS ═══ */
+.tool-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 28px; }
+.tool-card-header { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 20px; }
+.tool-card-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; background: none; border: none; color: var(--gold); font-size: 16px; font-weight: 700; cursor: pointer; padding: 4px 0 16px; }
+.tool-field { margin-bottom: 14px; }
+.tool-field label { display: block; color: var(--text-dim); font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.tool-field input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; color: var(--text); font-size: 15px; outline: none; transition: border 0.3s; }
+.tool-field input:focus { border-color: var(--gold); }
+.field-hint { color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block; }
+.tool-btn { width: 100%; background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); color: #fff; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 8px; }
+.tool-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(45,106,79,0.3); }
+.tool-result { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px solid rgba(255,255,255,0.04); }
+.tool-result-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; color: var(--text-dim); font-size: 14px; }
+.tool-result-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 10px 0; }
+.tool-result-main { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+.tool-result-main span { color: var(--text); font-size: 15px; font-weight: 600; }
+.zekat-amount { color: var(--gold) !important; font-size: 22px !important; font-weight: 800 !important; }
+.tool-result-info { display: flex; align-items: center; gap: 8px; color: var(--green-light); font-size: 14px; padding: 10px 0; }
+.tool-note { color: var(--text-muted); font-size: 12px; display: flex; align-items: center; gap: 6px; margin-top: 12px; line-height: 1.6; }
+
+/* ═══ DUALAR ═══ */
+.dua-category-title { color: var(--gold); font-size: 20px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(212,175,55,0.15); }
+.dua-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.04); border-radius: var(--radius); padding: 24px; margin-bottom: 12px; }
+.dua-card h3 { color: var(--text); font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+.dua-arabic { font-family: 'Amiri', serif; font-size: 24px; color: var(--gold); direction: rtl; text-align: right; line-height: 1.8; margin-bottom: 10px; }
+.dua-transliteration { color: var(--green-light); font-size: 13px; font-style: italic; margin-bottom: 6px; }
+.dua-meaning { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+
+/* ═══ KURAN SURELER ═══ */
+.sura-grid { display: flex; flex-direction: column; gap: 6px; }
+.sura-card { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; transition: all 0.3s; }
+.sura-card:hover { border-color: rgba(212,175,55,0.15); transform: translateX(4px); }
+.sura-no { width: 36px; height: 36px; border-radius: 10px; background: rgba(212,175,55,0.1); color: var(--gold); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sura-info { flex: 1; }
+.sura-name { color: var(--text); font-size: 15px; font-weight: 600; }
+.sura-meaning { color: var(--text-muted); font-size: 12px; }
+.sura-arabic { font-family: 'Amiri', serif; font-size: 20px; color: var(--gold); direction: rtl; }
+
+/* ═══ TESBIH ═══ */
+.dhikr-selector { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 24px; }
+.dhikr-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 8px 16px; color: var(--text-dim); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.dhikr-btn.active { background: var(--gold-dim); border-color: rgba(212,175,55,0.3); color: var(--gold); }
+.tesbih-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px 24px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.tesbih-card:active { transform: scale(0.98); }
+.tesbih-arabic { font-family: 'Amiri', serif; font-size: 36px; color: var(--gold); margin-bottom: 8px; }
+.tesbih-label { color: var(--text); font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.tesbih-meaning { color: var(--text-dim); font-size: 13px; margin-bottom: 24px; }
+.tesbih-counter { font-size: 72px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #F0D060); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+.tesbih-progress-bar { width: 80%; margin: 0 auto; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.tesbih-progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-light), var(--gold)); border-radius: 3px; transition: width 0.2s; }
+.tesbih-target { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
+.tesbih-controls { display: flex; align-items: center; gap: 12px; justify-content: center; margin-top: 20px; }
+.tesbih-controls button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 14px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 13px; transition: all 0.3s; }
+.tesbih-controls button:hover { background: rgba(255,255,255,0.1); }
+.tesbih-controls span { color: var(--gold); font-weight: 800; font-size: 18px; min-width: 40px; }
+.reset-btn { color: var(--text-dim) !important; }
+.quick-targets { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+.quick-target { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 6px 14px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.quick-target.active { background: var(--gold-dim); border-color: rgba(212,175,55,0.3); color: var(--gold); }
+.tesbih-complete { margin-top: 20px; padding: 14px; background: rgba(64,192,87,0.1); border: 1px solid rgba(64,192,87,0.2); border-radius: 14px; color: var(--green-light); font-weight: 600; font-size: 14px; }
+
+/* ═══ NAMAZ REHBERİ ═══ */
+.steps-list { display: flex; flex-direction: column; gap: 12px; }
+.prayer-step { display: flex; gap: 16px; padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.04); border-radius: var(--radius); }
+.prayer-step-num { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); color: var(--gold); font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.prayer-step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.prayer-step-content p { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+.prayer-step-tip { margin-top: 10px; padding: 10px; background: rgba(212,175,55,0.06); border-radius: 10px; color: var(--gold); font-size: 12px; font-weight: 500; line-height: 1.5; }
+.prayer-table { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.04); border-radius: var(--radius); overflow: hidden; }
+.prayer-table-header { display: grid; grid-template-columns: 80px 60px 1fr 1fr; padding: 14px 18px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+.prayer-table-row { display: grid; grid-template-columns: 80px 60px 1fr 1fr; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.02); align-items: center; font-size: 13px; color: var(--text-dim); }
+.prayer-name { color: var(--text); font-weight: 600; }
+.prayer-total { color: var(--gold); font-weight: 800; font-size: 16px; }
+.prayer-time { font-size: 12px; }
+
+/* ═══ HİCRİ TAKVİM ═══ */
+.important-dates { display: flex; flex-direction: column; gap: 8px; }
+.date-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 10px; }
+.date-hijri { color: var(--gold); font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .features-grid, .why-grid, .blog-grid { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .prayer-table-header, .prayer-table-row { grid-template-columns: 70px 50px 1fr; }
+  .prayer-time { display: none; }
 }
 @media (max-width: 480px) {
   .hero-buttons { flex-direction: column; align-items: center; }

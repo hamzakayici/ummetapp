@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "SSS", description: "Ümmet uygulamas
 const FAQ = [
   { q: "Ümmet uygulaması ücretsiz mi?", a: "Evet, tamamen ücretsizdir. Gizli ücret, premium duvarı veya reklam yoktur." },
   { q: "Namaz vakitleri ne kadar doğru?", a: "Diyanet İşleri Başkanlığı hesaplama yöntemi varsayılandır. 5 farklı yöntem seçebilirsiniz." },
-  { q: "Kıble pusulası doğru mu?", a: "Telefonunuzun pusula sensörü ve GPS ile hassas hesaplama yapılır. 8 hareketi ile kalibre edin." },
+  { q: "Kıble pusulası doğru mu?", a: "Evet. Hassas kıble hesaplama ile doğru yönü bulursunuz. Telefonunuzu 8 hareketi ile kalibre ederek daha doğru sonuç alabilirsiniz." },
   { q: "İnternet olmadan kullanabilir miyim?", a: "Kuran, dualar, zikir ve tesbih çevrimdışı çalışır. Namaz vakitleri ve camiler internet gerektirir." },
   { q: "Verilerim güvende mi?", a: "Evet. Tüm veriler cihazınızda saklanır. Sunucuya kişisel veri gönderilmez." },
   { q: "Hangi hesaplama yöntemleri var?", a: "Diyanet, Karaçi, Müslüman Dünya Birliği, Ümmül Kura ve Mısır Fetva Kurulu." },
