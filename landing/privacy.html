@@ -3,52 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gizlilik Politikası — Ümmet</title>
-  <meta name="description" content="Ümmet uygulaması gizlilik politikası. Verileriniz güvende.">
+  <title>Gizlilik Politikası — Ümmet İslami Yaşam Uygulaması</title>
+  <meta name="description" content="Ümmet uygulaması gizlilik politikası. Verileriniz güvende — kişisel bilgileriniz sunucuya gönderilmez.">
+  <link rel="canonical" href="https://ummetapp.com/privacy.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0A0E17; color: #ECDFCC; line-height: 1.8; }
-    .container { max-width: 720px; margin: 0 auto; padding: 60px 24px 80px; }
-    a { color: #D4AF37; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
-    .date { color: rgba(255,255,255,0.35); font-size: 13px; margin-bottom: 40px; }
-    h2 { font-size: 18px; font-weight: 700; color: #D4AF37; margin-top: 32px; margin-bottom: 12px; }
-    p { color: rgba(255,255,255,0.6); font-size: 15px; margin-bottom: 16px; }
-    .back { display: inline-flex; align-items: center; gap: 6px; color: #D4AF37; font-size: 14px; font-weight: 600; margin-bottom: 32px; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <a href="index.html" class="back">← Ana Sayfa</a>
-    <h1>Gizlilik Politikası</h1>
-    <p class="date">Son güncelleme: 20 Mart 2026</p>
+  <div class="bg-glow"></div>
+  <nav id="navbar"><div class="nav-inner"><a href="index.html" class="nav-logo"><span class="crescent">☪</span> Ümmet</a><ul class="nav-links" id="navLinks"><li><a href="ozellikler.html">Özellikler</a></li><li><a href="sss.html">SSS</a></li><li><a href="hakkimizda.html">Hakkımızda</a></li><li><a href="blog.html">Blog</a></li></ul><a href="index.html#download" class="nav-cta">İndir</a><button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('show')" aria-label="Menü"><span></span><span></span><span></span></button></div></nav>
+
+  <div class="page-hero"><span class="section-label">Yasal</span><h1>Gizlilik Politikası</h1><p>Verileriniz güvende — gizliliğiniz bizim için önceliklidir</p></div>
+
+  <div class="content-page">
+    <p class="meta">Son güncelleme: 20 Mart 2026</p>
 
     <h2>1. Toplanan Veriler</h2>
-    <p>Ümmet uygulaması, yalnızca namaz vakitlerini hesaplamak amacıyla konum bilginizi kullanır. Konum veriniz cihazınızda yerel olarak saklanır ve üçüncü taraflarla paylaşılmaz. Kişisel bilgileriniz (ad, e-posta vb.) yalnızca iletişim formunda siz paylaştığınızda toplanır.</p>
+    <p>Ümmet uygulaması, yalnızca namaz vakitlerini, kıble yönünü ve yakındaki camileri hesaplamak amacıyla konum bilginizi kullanır. Konum veriniz cihazınızda yerel olarak saklanır ve üçüncü taraflarla paylaşılmaz.</p>
+    <p>Kişisel bilgileriniz (ad, e-posta vb.) yalnızca iletişim formunda siz paylaştığınızda toplanır.</p>
 
     <h2>2. Verilerin Kullanımı</h2>
-    <p>Toplanan konum verisi yalnızca namaz vakitlerini, kıble yönünü ve yakındaki camileri belirlemek için kullanılır. İletişim formu verileri yalnızca destek taleplerine yanıt vermek için kullanılır.</p>
+    <p>Toplanan konum verisi yalnızca şu amaçlarla kullanılır:</p>
+    <ul>
+      <li>Namaz vakitlerini hesaplamak</li>
+      <li>Kıble yönünü belirlemek</li>
+      <li>Yakındaki camileri bulmak</li>
+    </ul>
+    <p>İletişim formu verileri yalnızca destek taleplerine yanıt vermek için kullanılır.</p>
 
     <h2>3. Verilerin Saklanması</h2>
-    <p>Namaz vakitleri, tercihleriniz ve ibadet takip verileriniz cihazınızda yerel olarak (AsyncStorage) saklanır. Sunuculara herhangi bir kişisel veri aktarılmaz.</p>
+    <p>Namaz vakitleri, tercihleriniz, ibadet takip verileriniz, okunan sureler ve zikir sayıları yalnızca cihazınızda yerel olarak (AsyncStorage) saklanır. Sunuculara herhangi bir kişisel veri aktarılmaz.</p>
 
     <h2>4. Üçüncü Taraf Hizmetler</h2>
-    <p>Uygulama, namaz vakitleri için Aladhan API'sini, konum adı için BigDataCloud API'sini, yakındaki camiler için OpenStreetMap Overpass API'sini kullanır. Bu hizmetlere yalnızca konum koordinatları gönderilir, kişisel bilgi paylaşılmaz.</p>
+    <p>Uygulama aşağıdaki üçüncü taraf API'lerini kullanır:</p>
+    <ul>
+      <li><strong>Aladhan API:</strong> Namaz vakitleri hesaplama — yalnızca konum koordinatları gönderilir</li>
+      <li><strong>BigDataCloud API:</strong> Konum adı belirleme — yalnızca konum koordinatları gönderilir</li>
+      <li><strong>OpenStreetMap Overpass API:</strong> Yakındaki camileri bulma — yalnızca konum koordinatları gönderilir</li>
+    </ul>
+    <p>Bu hizmetlere kişisel bilgi (ad, e-posta vb.) paylaşılmaz.</p>
 
     <h2>5. Bildirimler</h2>
-    <p>Namaz vakti bildirimleri, kullanıcının izni ile yerel olarak planlanır. Bildirim verileri herhangi bir sunucuya gönderilmez.</p>
+    <p>Namaz vakti bildirimleri, kullanıcının izni ile yerel olarak planlanır. Bildirim verileri herhangi bir sunucuya gönderilmez. Push bildirim servisleri kullanılmaz.</p>
 
-    <h2>6. Çocukların Gizliliği</h2>
-    <p>Uygulamamız tüm yaş grupları için uygundur ve çocuklardan bilerek kişisel bilgi toplamaz.</p>
+    <h2>6. Reklam ve İzleme</h2>
+    <p>Ümmet uygulaması reklam içermez. Kullanıcı izleme (tracking), analitik veya reklam SDK'ları kullanılmaz. IDFA veya benzeri tanımlayıcılar toplanmaz.</p>
 
-    <h2>7. Değişiklikler</h2>
-    <p>Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişiklikler uygulama içi bildirim ile duyurulacaktır.</p>
+    <h2>7. Çocukların Gizliliği</h2>
+    <p>Uygulamamız tüm yaş grupları için uygundur ve çocuklardan bilerek kişisel bilgi toplamaz. COPPA (Children's Online Privacy Protection Act) gerekliliklerine uyumludur.</p>
 
-    <h2>8. İletişim</h2>
+    <h2>8. Veri Silme</h2>
+    <p>Uygulamayı cihazınızdan sildiğinizde tüm verileriniz otomatik olarak silinir. Sunucularda saklanmış kişisel veriniz yoktur.</p>
+
+    <h2>9. Değişiklikler</h2>
+    <p>Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişiklikler uygulama içi bildirim ile duyurulacaktır. Güncel politika her zaman bu sayfadan erişilebilir olacaktır.</p>
+
+    <h2>10. İletişim</h2>
     <p>Gizlilik politikamız hakkında sorularınız için <a href="mailto:destek@ummetapp.com">destek@ummetapp.com</a> adresinden bize ulaşabilirsiniz.</p>
   </div>
+
+  <footer><div class="footer-inner"><div class="footer-brand"><a href="index.html" class="nav-logo"><span class="crescent">☪</span> Ümmet</a><p>İslami yaşamınız için kapsamlı uygulama.</p></div><div class="footer-col"><h4>Yasal</h4><a href="privacy.html">Gizlilik Politikası</a><a href="terms.html">Kullanım Şartları</a></div><div class="footer-col"><h4>İletişim</h4><a href="mailto:destek@ummetapp.com">destek@ummetapp.com</a></div><div class="footer-col"><h4>Uygulama</h4><a href="ozellikler.html">Özellikler</a><a href="sss.html">SSS</a></div></div><div class="footer-bottom"><p>© 2026 Ümmet App.</p><p>☪</p></div></footer>
+  <script>window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50)});</script>
 </body>
 </html>
