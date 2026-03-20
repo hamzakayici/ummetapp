@@ -82,18 +82,86 @@ export default function DelailulHayratScreen() {
           {/* Tanıtım Kartı */}
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <LinearGradient
-              colors={["#FFFFFF", "#0F1923"]}
+              colors={["rgba(27,67,50,0.4)", "rgba(15,25,35,0.8)"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={{
                 marginHorizontal: 20,
-                borderRadius: 16,
-                padding: 16,
+                borderRadius: 20,
+                padding: 20,
                 borderWidth: 1,
                 borderColor: "rgba(212,175,55,0.15)",
               }}
             >
-              <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 15, lineHeight: 24 }}>
+              {/* Dekoratif üst çizgi */}
+              <LinearGradient
+                colors={["transparent", "rgba(212,175,55,0.4)", "transparent"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  height: 1,
+                  position: "absolute",
+                  top: 0,
+                  left: 30,
+                  right: 30,
+                  borderRadius: 1,
+                }}
+              />
+
+              {/* İkon ve başlık */}
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 14 }}>
+                <View style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: "rgba(212,175,55,0.1)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 1,
+                  borderColor: "rgba(212,175,55,0.2)",
+                }}>
+                  <MaterialCommunityIcons name="book-open-variant" size={22} color="#D4AF37" />
+                </View>
+                <View style={{ marginLeft: 12, flex: 1 }}>
+                  <Text style={{ color: "#D4AF37", fontSize: 16, fontWeight: "700" }}>
+                    Delâilü'l-Hayrât Nedir?
+                  </Text>
+                  <Text style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginTop: 2 }}>
+                    Salavat-ı Şerîfe Mecmuası
+                  </Text>
+                </View>
+              </View>
+
+              {/* Ayırıcı */}
+              <View style={{
+                height: 1,
+                backgroundColor: "rgba(212,175,55,0.08)",
+                marginBottom: 14,
+              }} />
+
+              <Text style={{
+                color: "rgba(255,255,255,0.75)",
+                fontSize: 14,
+                lineHeight: 24,
+                letterSpacing: 0.2,
+              }}>
                 {DELAIL_INTRO.description}
               </Text>
+
+              {/* Alt bilgi */}
+              <View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 14,
+                paddingTop: 14,
+                borderTopWidth: 1,
+                borderTopColor: "rgba(212,175,55,0.08)",
+              }}>
+                <MaterialCommunityIcons name="calendar-check" size={14} color="rgba(212,175,55,0.5)" />
+                <Text style={{ color: "rgba(212,175,55,0.5)", fontSize: 12, marginLeft: 6 }}>
+                  Her gün bir hizb okunur · 7 günde tamamlanır
+                </Text>
+              </View>
             </LinearGradient>
           </Animated.View>
 
