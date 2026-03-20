@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ummet.app",
+      "buildNumber": "1",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Namaz vakitlerini ve Kıble yönünü belirlemek için konumunuza ihtiyacımız var.",
         "NSMotionUsageDescription": "Kıble pusulası için sensör erişimi gereklidir.",
@@ -29,6 +30,7 @@
         "backgroundColor": "#0A0F14"
       },
       "package": "com.ummet.app",
+      "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "permissions": [
         "ACCESS_FINE_LOCATION",
