@@ -52,7 +52,9 @@
       "expo-av",
       "./plugins/withWidget",
       "expo-notifications",
-      "./plugins/withEzanSounds"
+      "./plugins/withEzanSounds",
+      "expo-updates",
+      "expo-application"
     ]
   }
 }

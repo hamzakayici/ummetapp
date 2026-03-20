@@ -6,6 +6,7 @@ import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useUpdateChecker } from "../../src/hooks/useUpdateChecker";
 
 const TAB_CONFIG: {
   name: string;
@@ -132,6 +133,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 }
 
 export default function TabLayout() {
+  useUpdateChecker();
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
