@@ -29,6 +29,7 @@ export function useForcedUpdate() {
     "Yeni sürüm yayınlandı. Devam edebilmek için lütfen uygulamayı güncelleyin."
   );
   const [minVersion, setMinVersion] = useState<string>("");
+  const [releaseNotesUrl, setReleaseNotesUrl] = useState<string>("");
   const lastShownRef = useRef(false);
 
   const check = useCallback(async () => {
@@ -39,12 +40,14 @@ export function useForcedUpdate() {
 
       const enabled = String(rc["force_update_enabled"] ?? "").toLowerCase() === "true";
       const min = String(rc["min_required_version"] ?? "").trim();
+      const rn = String(rc["force_update_release_notes_url"] ?? "").trim();
       const msg =
         String(rc["force_update_message"] ?? "").trim() ||
         "Yeni sürüm yayınlandı. Devam edebilmek için lütfen uygulamayı güncelleyin.";
 
       setMessage(msg);
       setMinVersion(min);
+      setReleaseNotesUrl(rn);
 
       if (!enabled || !min) {
         setRequired(false);
@@ -80,6 +83,22 @@ export function useForcedUpdate() {
     void Linking.openURL(STORE_URL);
   }, []);
 
-  return { required, message, minVersion, storeUrl: STORE_URL, openStore };
+  const openReleaseNotes = useCallback(() => {
+    if (!releaseNotesUrl) return;
+    void Linking.openURL(releaseNotesUrl);
+  }, [releaseNotesUrl]);
+
+  const currentVersion = Application.nativeApplicationVersion ?? "";
+
+  return {
+    required,
+    message,
+    minVersion,
+    currentVersion,
+    releaseNotesUrl,
+    storeUrl: STORE_URL,
+    openStore,
+    openReleaseNotes,
+  };
 }
 

@@ -144,26 +144,52 @@ export default function RootLayout() {
           <Text style={{ color: "#8A9BA8", fontSize: 14, lineHeight: 20 }}>
             {forced.message}
           </Text>
-          {forced.minVersion ? (
-            <Text style={{ color: "#5A6B78", fontSize: 12, marginTop: 10 }}>
-              Minimum sürüm: {forced.minVersion}
-            </Text>
-          ) : null}
+          <View style={{ marginTop: 10 }}>
+            {forced.currentVersion ? (
+              <Text style={{ color: "#5A6B78", fontSize: 12 }}>
+                Mevcut sürüm: {forced.currentVersion}
+              </Text>
+            ) : null}
+            {forced.minVersion ? (
+              <Text style={{ color: "#5A6B78", fontSize: 12, marginTop: forced.currentVersion ? 4 : 0 }}>
+                Minimum sürüm: {forced.minVersion}
+              </Text>
+            ) : null}
+          </View>
 
-          <TouchableOpacity
-            onPress={forced.openStore}
-            activeOpacity={0.85}
-            style={{
-              marginTop: 16,
-              height: 48,
-              borderRadius: 14,
-              backgroundColor: "#D4AF37",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ color: "#0A0F14", fontSize: 14, fontWeight: "800" }}>Güncelle</Text>
-          </TouchableOpacity>
+          <View style={{ marginTop: 16, gap: 10 }}>
+            <TouchableOpacity
+              onPress={forced.openStore}
+              activeOpacity={0.85}
+              style={{
+                height: 48,
+                borderRadius: 14,
+                backgroundColor: "#D4AF37",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: "#0A0F14", fontSize: 14, fontWeight: "800" }}>Güncelle</Text>
+            </TouchableOpacity>
+
+            {forced.releaseNotesUrl ? (
+              <TouchableOpacity
+                onPress={forced.openReleaseNotes}
+                activeOpacity={0.85}
+                style={{
+                  height: 46,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: "rgba(212,175,55,0.22)",
+                  backgroundColor: "rgba(18, 26, 36, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "#D4AF37", fontSize: 13, fontWeight: "800" }}>Sürüm notları</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
       </View>
     );
