@@ -1,7 +1,9 @@
 import { Pool } from 'pg'
+import crypto from 'crypto'
 
 type PushTargetPlatform = 'all' | 'ios' | 'android'
 type AudienceSegment = 'all' | 'active_1d' | 'active_7d' | 'active_30d' | 'event_1d' | 'event_7d' | 'event_30d'
+type AbVariant = 'A' | 'B'
 
 type ExpoPushMessage = {
   to: string
@@ -19,6 +21,14 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out
 }
 
+function stableBucket(input: string): number {
+  // 0..99 deterministic
+  const h = crypto.createHash('sha256').update(input).digest()
+  return h[0] % 100
+}
+
+type TokenRow = { expo_push_token: string; device_id: string | null }
+
 async function getTokens({
   connectionString,
   platform,
@@ -29,7 +39,7 @@ async function getTokens({
   platform: PushTargetPlatform
   segment?: AudienceSegment
   eventName?: string
-}): Promise<string[]> {
+}): Promise<TokenRow[]> {
   const pool = new Pool({
     connectionString,
     ssl: connectionString.includes('pooler.supabase.com') ? false : { rejectUnauthorized: false },
@@ -78,17 +88,53 @@ async function getTokens({
 
     const where = clauses.length > 0 ? `where ${clauses.join(' and ')}` : ''
     const { rows } = await pool.query(
-      `select expo_push_token from public.push_tokens ${where} order by coalesce(last_seen_at, updated_at) desc limit 20000;`,
+      `select expo_push_token, device_id from public.push_tokens ${where} order by coalesce(last_seen_at, updated_at) desc limit 20000;`,
       params,
     )
     return (rows || [])
-      .map((r: any) => String(r?.expo_push_token || ''))
-      .filter(Boolean)
-      // Expo token format check (basic)
-      .filter((t) => t.startsWith('ExponentPushToken[') || t.startsWith('ExpoPushToken['))
+      .map((r: any) => ({
+        expo_push_token: String(r?.expo_push_token || ''),
+        device_id: r?.device_id ? String(r.device_id) : null,
+      }))
+      .filter((r) => Boolean(r.expo_push_token))
+      .filter((r) => r.expo_push_token.startsWith('ExponentPushToken[') || r.expo_push_token.startsWith('ExpoPushToken['))
   } finally {
     await pool.end()
   }
+}
+
+async function sendExpoMessages(messages: ExpoPushMessage[]) {
+  // Expo recommends max 100 messages per request.
+  const batches = chunk(messages, 100)
+  let sent = 0
+  const errors: string[] = []
+
+  for (const batch of batches) {
+    const res = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(batch),
+    })
+
+    if (!res.ok) {
+      errors.push(`Expo push HTTP ${res.status}`)
+      continue
+    }
+
+    const json: any = await res.json().catch(() => null)
+    const dataArr: any[] = Array.isArray(json?.data) ? json.data : []
+    sent += dataArr.length
+    for (const item of dataArr) {
+      if (item?.status === 'error') errors.push(String(item?.message || 'unknown error'))
+    }
+  }
+
+  if (errors.length > 0) return { ok: false as const, sent, error: errors.slice(0, 5).join(' | ') }
+  return { ok: true as const, sent }
 }
 
 export async function sendExpoPushToAll({
@@ -113,55 +159,67 @@ export async function sendExpoPushToAll({
     return { ok: false as const, sent: 0, error: 'push_tokens tablosunda geçerli expo_push_token bulunamadı.' }
   }
 
-  // Expo recommends max 100 messages per request.
-  const batches = chunk(tokens, 100)
+  const messages: ExpoPushMessage[] = tokens.map((r) => ({
+    to: r.expo_push_token,
+    title,
+    body,
+    data,
+    sound: 'default',
+    priority: 'high',
+  }))
 
-  let sent = 0
-  const errors: string[] = []
+  return await sendExpoMessages(messages)
+}
 
-  for (const batch of batches) {
-    const messages: ExpoPushMessage[] = batch.map((to) => ({
-      to,
-      title,
-      body,
-      data,
+export async function sendExpoPushAB({
+  connectionString,
+  campaignId,
+  platform = 'all',
+  segment = 'all',
+  eventName,
+  splitPercentA = 50,
+  A,
+  B,
+}: {
+  connectionString: string
+  campaignId: string
+  platform?: PushTargetPlatform
+  segment?: AudienceSegment
+  eventName?: string
+  splitPercentA?: number
+  A: { title: string; body: string; data?: Record<string, unknown> }
+  B: { title: string; body: string; data?: Record<string, unknown> }
+}) {
+  const tokens = await getTokens({ connectionString, platform, segment, eventName })
+  if (tokens.length === 0) {
+    return { ok: false as const, sentA: 0, sentB: 0, error: 'push_tokens tablosunda geçerli expo_push_token bulunamadı.' }
+  }
+
+  const pctA = Math.max(0, Math.min(100, Math.round(splitPercentA)))
+  const msgs: ExpoPushMessage[] = []
+  let countA = 0
+  let countB = 0
+
+  for (const row of tokens) {
+    const key = `${campaignId}:${row.device_id || row.expo_push_token}`
+    const bucket = stableBucket(key)
+    const v: AbVariant = bucket < pctA ? 'A' : 'B'
+    const payload = v === 'A' ? A : B
+    if (v === 'A') countA += 1
+    else countB += 1
+
+    msgs.push({
+      to: row.expo_push_token,
+      title: payload.title,
+      body: payload.body,
+      data: { ...(payload.data || {}), campaign_id: campaignId, ab: v },
       sound: 'default',
       priority: 'high',
-      // For Android channels, if needed later:
-      // channelId: 'default',
-    }))
-
-    const res = await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-Encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(messages),
     })
-
-    if (!res.ok) {
-      errors.push(`Expo push HTTP ${res.status}`)
-      continue
-    }
-
-    const json: any = await res.json().catch(() => null)
-    const dataArr: any[] = Array.isArray(json?.data) ? json.data : []
-    sent += dataArr.length
-
-    for (const item of dataArr) {
-      if (item?.status === 'error') {
-        const msg = String(item?.message || 'unknown error')
-        errors.push(msg)
-      }
-    }
   }
 
-  if (errors.length > 0) {
-    return { ok: false as const, sent, error: errors.slice(0, 5).join(' | ') }
-  }
-
-  return { ok: true as const, sent }
+  const res = await sendExpoMessages(msgs)
+  if (!res.ok) return { ok: false as const, sentA: 0, sentB: 0, error: res.error }
+  return { ok: true as const, sentA: countA, sentB: countB }
 }
 

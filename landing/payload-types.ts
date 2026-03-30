@@ -194,8 +194,34 @@ export interface PushToken {
  */
 export interface PushNotification {
   id: number;
-  title: string;
-  body: string;
+  mode?: ('single' | 'ab') | null;
+  title?: string | null;
+  body?: string | null;
+  ab?: {
+    split_percent_a?: number | null;
+    a_title: string;
+    a_body: string;
+    a_data?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    b_title: string;
+    b_body: string;
+    b_data?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   /**
    * Segmentleme için push_tokens.device_id ile app_events.device_id eşleşmesi gerekir.
    */
@@ -224,6 +250,8 @@ export interface PushNotification {
   status?: ('draft' | 'sending' | 'sent' | 'failed') | null;
   sent_at?: string | null;
   sent_count?: number | null;
+  sent_count_a?: number | null;
+  sent_count_b?: number | null;
   error?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -464,8 +492,20 @@ export interface PushTokensSelect<T extends boolean = true> {
  * via the `definition` "push_notifications_select".
  */
 export interface PushNotificationsSelect<T extends boolean = true> {
+  mode?: T;
   title?: T;
   body?: T;
+  ab?:
+    | T
+    | {
+        split_percent_a?: T;
+        a_title?: T;
+        a_body?: T;
+        a_data?: T;
+        b_title?: T;
+        b_body?: T;
+        b_data?: T;
+      };
   segment?: T;
   event_name?: T;
   platform?: T;
@@ -474,6 +514,8 @@ export interface PushNotificationsSelect<T extends boolean = true> {
   status?: T;
   sent_at?: T;
   sent_count?: T;
+  sent_count_a?: T;
+  sent_count_b?: T;
   error?: T;
   updatedAt?: T;
   createdAt?: T;

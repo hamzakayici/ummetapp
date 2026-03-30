@@ -96,6 +96,15 @@ export default function RootLayout() {
       if (data?.type === "ezan" && data?.prayerName) {
         playEzan(data.prayerName as string);
       }
+      if (data?.campaign_id) {
+        void analyticsTrack({
+          name: "push_open",
+          props: {
+            campaign_id: String(data.campaign_id),
+            ab: data?.ab ? String(data.ab) : undefined,
+          },
+        });
+      }
     });
 
     return () => {

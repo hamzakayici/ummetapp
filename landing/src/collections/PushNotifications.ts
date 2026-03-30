@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { sendExpoPushToAll } from '../services/expoPush'
+import { sendExpoPushAB, sendExpoPushToAll } from '../services/expoPush'
 
 type Status = 'draft' | 'sending' | 'sent' | 'failed'
 
@@ -14,8 +14,86 @@ export const PushNotifications: CollectionConfig = {
     defaultColumns: ['title', 'platform', 'status', 'sent_at', 'updatedAt'],
   },
   fields: [
-    { name: 'title', type: 'text', label: 'Başlık', required: true },
-    { name: 'body', type: 'textarea', label: 'Mesaj', required: true },
+    {
+      name: 'mode',
+      type: 'select',
+      label: 'Gönderim Modu',
+      options: [
+        { label: 'Tek Mesaj', value: 'single' },
+        { label: 'A/B Test', value: 'ab' },
+      ],
+      defaultValue: 'single',
+    },
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Başlık',
+      required: true,
+      admin: {
+        condition: (_, siblingData) => (siblingData as any)?.mode !== 'ab',
+      },
+    },
+    {
+      name: 'body',
+      type: 'textarea',
+      label: 'Mesaj',
+      required: true,
+      admin: {
+        condition: (_, siblingData) => (siblingData as any)?.mode !== 'ab',
+      },
+    },
+    {
+      name: 'ab',
+      type: 'group',
+      label: 'A/B Test Ayarları',
+      admin: {
+        condition: (_, siblingData) => (siblingData as any)?.mode === 'ab',
+      },
+      fields: [
+        {
+          name: 'split_percent_a',
+          type: 'number',
+          label: 'A Yüzdesi',
+          defaultValue: 50,
+          min: 0,
+          max: 100,
+        },
+        {
+          name: 'a_title',
+          type: 'text',
+          label: 'A Başlık',
+          required: true,
+        },
+        {
+          name: 'a_body',
+          type: 'textarea',
+          label: 'A Mesaj',
+          required: true,
+        },
+        {
+          name: 'a_data',
+          type: 'json',
+          label: 'A Data (opsiyonel)',
+        },
+        {
+          name: 'b_title',
+          type: 'text',
+          label: 'B Başlık',
+          required: true,
+        },
+        {
+          name: 'b_body',
+          type: 'textarea',
+          label: 'B Mesaj',
+          required: true,
+        },
+        {
+          name: 'b_data',
+          type: 'json',
+          label: 'B Data (opsiyonel)',
+        },
+      ],
+    },
     {
       name: 'segment',
       type: 'select',
@@ -60,6 +138,7 @@ export const PushNotifications: CollectionConfig = {
       label: 'Ek Veri (data)',
       admin: {
         description: 'Mobil uygulama içinde yönlendirme vb. için JSON gönderebilirsiniz.',
+        condition: (_, siblingData) => (siblingData as any)?.mode !== 'ab',
       },
     },
     {
@@ -97,6 +176,18 @@ export const PushNotifications: CollectionConfig = {
       admin: { readOnly: true },
     },
     {
+      name: 'sent_count_a',
+      type: 'number',
+      label: 'A Gönderilen',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
+      name: 'sent_count_b',
+      type: 'number',
+      label: 'B Gönderilen',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
       name: 'error',
       type: 'textarea',
       label: 'Hata',
@@ -123,28 +214,53 @@ export const PushNotifications: CollectionConfig = {
         await req.payload.update({
           collection: 'push_notifications',
           id: doc.id,
-          data: { status: 'sending', error: null, sent_count: 0 },
+          data: { status: 'sending', error: null, sent_count: 0, sent_count_a: 0, sent_count_b: 0 },
         })
 
-        const res = await sendExpoPushToAll({
+        const mode = String((doc as any).mode || 'single')
+        const campaignId = `push_${String(doc.id)}`
+        const common = {
           connectionString,
-          title: String((doc as any).title || ''),
-          body: String((doc as any).body || ''),
-          data: ((doc as any).data as any) || undefined,
           platform: ((doc as any).platform as any) || 'all',
           segment: ((doc as any).segment as any) || 'all',
           eventName: String((doc as any).event_name || ''),
-        })
+        }
+
+        const res =
+          mode === 'ab'
+            ? await sendExpoPushAB({
+                ...common,
+                campaignId,
+                splitPercentA: Number((doc as any)?.ab?.split_percent_a ?? 50),
+                A: {
+                  title: String((doc as any)?.ab?.a_title || ''),
+                  body: String((doc as any)?.ab?.a_body || ''),
+                  data: ((doc as any)?.ab?.a_data as any) || undefined,
+                },
+                B: {
+                  title: String((doc as any)?.ab?.b_title || ''),
+                  body: String((doc as any)?.ab?.b_body || ''),
+                  data: ((doc as any)?.ab?.b_data as any) || undefined,
+                },
+              })
+            : await sendExpoPushToAll({
+                ...common,
+                title: String((doc as any).title || ''),
+                body: String((doc as any).body || ''),
+                data: { ...(((doc as any).data as any) || {}), campaign_id: campaignId, ab: 'single' },
+              })
 
         ctx.__skipPushNotificationHook = true
-        if (res.ok) {
+        if ((res as any).ok) {
           await req.payload.update({
             collection: 'push_notifications',
             id: doc.id,
             data: {
               status: 'sent',
               sent_at: new Date().toISOString(),
-              sent_count: res.sent,
+              sent_count: (res as any).sent ?? (((res as any).sentA || 0) + ((res as any).sentB || 0)),
+              sent_count_a: (res as any).sentA ?? 0,
+              sent_count_b: (res as any).sentB ?? 0,
               error: null,
               send_now: false,
             },
@@ -155,8 +271,10 @@ export const PushNotifications: CollectionConfig = {
             id: doc.id,
             data: {
               status: 'failed',
-              error: res.error,
-              sent_count: res.sent ?? 0,
+              error: (res as any).error,
+              sent_count: (res as any).sent ?? 0,
+              sent_count_a: 0,
+              sent_count_b: 0,
               send_now: false,
             },
           })
