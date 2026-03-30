@@ -19,6 +19,8 @@ type Metrics = {
     rateD1: number
     rateD7: number
   }>
+  sessions24h: number
+  avgSessionMs24h: number
 }
 
 async function getMetrics(): Promise<Metrics> {
@@ -35,6 +37,8 @@ async function getMetrics(): Promise<Metrics> {
       d1Retention: 0,
       d7Retention: 0,
       cohortRows: [],
+      sessions24h: 0,
+      avgSessionMs24h: 0,
     }
   }
 
@@ -45,7 +49,14 @@ async function getMetrics(): Promise<Metrics> {
   })
 
   try {
-    const [{ rows: baseRows }, { rows: topRows }, { rows: deviceRows }, { rows: retentionRows }, { rows: cohortRows }] =
+    const [
+      { rows: baseRows },
+      { rows: topRows },
+      { rows: deviceRows },
+      { rows: retentionRows },
+      { rows: cohortRows },
+      { rows: sessionRows },
+    ] =
       await Promise.all([
       pool.query(
         `
@@ -140,6 +151,17 @@ async function getMetrics(): Promise<Metrics> {
         order by f.cohort_date desc;
         `,
       ),
+      pool.query(
+        `
+        select
+          count(*)::int as sessions_24h,
+          coalesce(avg(duration_ms), 0)::bigint as avg_session_ms_24h
+        from public.app_sessions
+        where started_at >= now() - interval '1 day'
+          and duration_ms is not null
+          and duration_ms > 0;
+        `,
+      ),
     ])
 
     const base = baseRows[0] || { dau: 0, wau: 0, mau: 0, events24h: 0 }
@@ -177,6 +199,8 @@ async function getMetrics(): Promise<Metrics> {
           rateD7: size > 0 ? retainedD7 / size : 0,
         }
       }),
+      sessions24h: Number(sessionRows?.[0]?.sessions_24h || 0),
+      avgSessionMs24h: Number(sessionRows?.[0]?.avg_session_ms_24h || 0),
     }
   } finally {
     await pool.end()
@@ -203,6 +227,13 @@ function Card({ title, value, sub }: { title: string; value: React.ReactNode; su
 export default async function AnalyticsDashboard() {
   const m = await getMetrics()
   const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
+  const fmtDuration = (ms: number) => {
+    const s = Math.max(0, Math.round(ms / 1000))
+    const mnt = Math.floor(s / 60)
+    const sec = s % 60
+    if (mnt <= 0) return `${sec}s`
+    return `${mnt}dk ${sec}s`
+  }
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -223,6 +254,13 @@ export default async function AnalyticsDashboard() {
         <Card title="Geri dönen cihaz (24s)" value={m.returningDevices24h} />
         <Card title="Retention D+1 (dün cohort)" value={pct(m.d1Retention)} sub="Dün ilk kez gelenlerin bugün geri dönüşü" />
         <Card title="Retention D+7 (7g önce cohort)" value={pct(m.d7Retention)} sub="7 gün önce ilk kez gelenlerin bugün geri dönüşü" />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12, marginTop: 12 }}>
+        <Card title="Oturum (24s)" value={m.sessions24h} />
+        <Card title="Ort. oturum süresi (24s)" value={fmtDuration(m.avgSessionMs24h)} />
+        <Card title="—" value="—" />
+        <Card title="—" value="—" />
       </div>
 
       <div

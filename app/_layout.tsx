@@ -2,7 +2,7 @@ import "../global.css";
 import { useEffect, useRef } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { View, ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { View, ActivityIndicator, Text, TouchableOpacity, AppState } from "react-native";
 import * as Notifications from "expo-notifications";
 import { playEzan, stopEzan } from "../src/services/audioService";
 import { registerPushToken } from "../src/services/pushTokenService";
@@ -32,7 +32,7 @@ import {
 } from "@expo-google-fonts/noto-naskh-arabic";
 import * as SplashScreen from "expo-splash-screen";
 import { router, usePathname } from "expo-router";
-import { analyticsStartSession, analyticsTrack } from "../src/services/analytics";
+import { analyticsEndSession, analyticsStartSession, analyticsTrack } from "../src/services/analytics";
 import { refreshAnnouncements, refreshRemoteConfig } from "../src/services/remoteConfig";
 import { useForcedUpdate } from "../src/hooks/useForcedUpdate";
 
@@ -74,6 +74,18 @@ export default function RootLayout() {
       void refreshAnnouncements();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "background" || state === "inactive") {
+        void analyticsEndSession();
+      }
+      if (state === "active") {
+        void analyticsStartSession();
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     if (!pathname) return;
