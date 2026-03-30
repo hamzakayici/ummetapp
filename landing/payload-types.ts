@@ -275,6 +275,9 @@ export interface Announcement {
   content?: string | null;
   active?: boolean | null;
   type?: ('info' | 'warning' | 'update') | null;
+  opens_total?: number | null;
+  unique_devices?: number | null;
+  opens_24h?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -544,6 +547,9 @@ export interface AnnouncementsSelect<T extends boolean = true> {
   content?: T;
   active?: T;
   type?: T;
+  opens_total?: T;
+  unique_devices?: T;
+  opens_24h?: T;
   updatedAt?: T;
   createdAt?: T;
 }
