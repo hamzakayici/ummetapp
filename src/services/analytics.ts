@@ -48,6 +48,10 @@ async function getOrCreateDeviceId(): Promise<string> {
   return id;
 }
 
+export async function getAnalyticsDeviceId(): Promise<string> {
+  return await getOrCreateDeviceId();
+}
+
 async function getOrCreateSessionId(): Promise<string> {
   const existing = await AsyncStorage.getItem(SESSION_ID_KEY);
   if (existing) return existing;

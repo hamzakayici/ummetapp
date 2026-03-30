@@ -179,6 +179,12 @@ export interface PushToken {
   id: number;
   expo_push_token: string;
   platform?: ('ios' | 'android' | 'web') | null;
+  /**
+   * Mobil analytics ile aynı device_id. Segmentleme için kullanılır.
+   */
+  device_id?: string | null;
+  app_version?: string | null;
+  last_seen_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -190,6 +196,14 @@ export interface PushNotification {
   id: number;
   title: string;
   body: string;
+  /**
+   * Segmentleme için push_tokens.device_id ile app_events.device_id eşleşmesi gerekir.
+   */
+  segment?: ('all' | 'active_1d' | 'active_7d' | 'active_30d' | 'event_1d' | 'event_7d' | 'event_30d') | null;
+  /**
+   * Örn: screen_view, app_open, daily_goal_reached
+   */
+  event_name?: string | null;
   platform?: ('all' | 'ios' | 'android') | null;
   /**
    * Mobil uygulama içinde yönlendirme vb. için JSON gönderebilirsiniz.
@@ -439,6 +453,9 @@ export interface SharedDhikrsSelect<T extends boolean = true> {
 export interface PushTokensSelect<T extends boolean = true> {
   expo_push_token?: T;
   platform?: T;
+  device_id?: T;
+  app_version?: T;
+  last_seen_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -449,6 +466,8 @@ export interface PushTokensSelect<T extends boolean = true> {
 export interface PushNotificationsSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  segment?: T;
+  event_name?: T;
   platform?: T;
   data?: T;
   send_now?: T;

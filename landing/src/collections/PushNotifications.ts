@@ -17,6 +17,33 @@ export const PushNotifications: CollectionConfig = {
     { name: 'title', type: 'text', label: 'Başlık', required: true },
     { name: 'body', type: 'textarea', label: 'Mesaj', required: true },
     {
+      name: 'segment',
+      type: 'select',
+      label: 'Hedef Kitle (Segment)',
+      options: [
+        { label: 'Tümü', value: 'all' },
+        { label: 'Son 24 saat aktif (DAU)', value: 'active_1d' },
+        { label: 'Son 7 gün aktif (WAU)', value: 'active_7d' },
+        { label: 'Son 30 gün aktif (MAU)', value: 'active_30d' },
+        { label: 'Son 24s belirli event yapan', value: 'event_1d' },
+        { label: 'Son 7g belirli event yapan', value: 'event_7d' },
+        { label: 'Son 30g belirli event yapan', value: 'event_30d' },
+      ],
+      defaultValue: 'all',
+      admin: {
+        description: 'Segmentleme için push_tokens.device_id ile app_events.device_id eşleşmesi gerekir.',
+      },
+    },
+    {
+      name: 'event_name',
+      type: 'text',
+      label: 'Event Adı (segment = event_*)',
+      admin: {
+        condition: (_, siblingData) => String((siblingData as any)?.segment || 'all').startsWith('event_'),
+        description: 'Örn: screen_view, app_open, daily_goal_reached',
+      },
+    },
+    {
       name: 'platform',
       type: 'select',
       label: 'Hedef Platform',
@@ -105,6 +132,8 @@ export const PushNotifications: CollectionConfig = {
           body: String((doc as any).body || ''),
           data: ((doc as any).data as any) || undefined,
           platform: ((doc as any).platform as any) || 'all',
+          segment: ((doc as any).segment as any) || 'all',
+          eventName: String((doc as any).event_name || ''),
         })
 
         ctx.__skipPushNotificationHook = true

@@ -28,5 +28,23 @@ export const PushTokens: CollectionConfig = {
       ],
       defaultValue: 'ios',
     },
+    {
+      name: 'device_id',
+      type: 'text',
+      label: 'Device ID',
+      admin: {
+        description: 'Mobil analytics ile aynı device_id. Segmentleme için kullanılır.',
+      },
+    },
+    {
+      name: 'app_version',
+      type: 'text',
+      label: 'App Version',
+    },
+    {
+      name: 'last_seen_at',
+      type: 'date',
+      label: 'Son Görülme',
+    },
   ],
 };

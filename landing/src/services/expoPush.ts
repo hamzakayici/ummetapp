@@ -1,6 +1,7 @@
 import { Pool } from 'pg'
 
 type PushTargetPlatform = 'all' | 'ios' | 'android'
+type AudienceSegment = 'all' | 'active_1d' | 'active_7d' | 'active_30d' | 'event_1d' | 'event_7d' | 'event_30d'
 
 type ExpoPushMessage = {
   to: string
@@ -21,9 +22,13 @@ function chunk<T>(arr: T[], size: number): T[][] {
 async function getTokens({
   connectionString,
   platform,
+  segment,
+  eventName,
 }: {
   connectionString: string
   platform: PushTargetPlatform
+  segment?: AudienceSegment
+  eventName?: string
 }): Promise<string[]> {
   const pool = new Pool({
     connectionString,
@@ -32,11 +37,49 @@ async function getTokens({
   })
 
   try {
-    const where = platform === 'all' ? '' : 'where platform = $1'
-    const params = platform === 'all' ? [] : [platform]
+    const seg = segment || 'all'
+    const clauses: string[] = []
+    const params: any[] = []
+
+    if (platform !== 'all') {
+      params.push(platform)
+      clauses.push(`platform = $${params.length}`)
+    }
+
+    if (seg !== 'all') {
+      // Segment requires device_id linkage; ignore segment if missing in DB rows.
+      const days =
+        seg === 'active_1d' || seg === 'event_1d'
+          ? 1
+          : seg === 'active_7d' || seg === 'event_7d'
+            ? 7
+            : 30
+
+      params.push(days)
+      const daysParam = `$${params.length}`
+
+      if (seg.startsWith('active_')) {
+        clauses.push(
+          `device_id is not null and device_id in (select distinct device_id from public.app_events where ts >= now() - (${daysParam}::int * interval '1 day'))`,
+        )
+      } else {
+        const name = String(eventName || '').trim()
+        if (!name) {
+          // no eventName => no tokens (safe fail)
+          return []
+        }
+        params.push(name)
+        const nameParam = `$${params.length}`
+        clauses.push(
+          `device_id is not null and device_id in (select distinct device_id from public.app_events where ts >= now() - (${daysParam}::int * interval '1 day') and name = ${nameParam})`,
+        )
+      }
+    }
+
+    const where = clauses.length > 0 ? `where ${clauses.join(' and ')}` : ''
     const { rows } = await pool.query(
-      `select expo_push_token from public.push_tokens ${where} order by updated_at desc limit 20000;`,
-      params as any,
+      `select expo_push_token from public.push_tokens ${where} order by coalesce(last_seen_at, updated_at) desc limit 20000;`,
+      params,
     )
     return (rows || [])
       .map((r: any) => String(r?.expo_push_token || ''))
@@ -54,14 +97,18 @@ export async function sendExpoPushToAll({
   body,
   data,
   platform = 'all',
+  segment = 'all',
+  eventName,
 }: {
   connectionString: string
   title: string
   body: string
   data?: Record<string, unknown>
   platform?: PushTargetPlatform
+  segment?: AudienceSegment
+  eventName?: string
 }) {
-  const tokens = await getTokens({ connectionString, platform })
+  const tokens = await getTokens({ connectionString, platform, segment, eventName })
   if (tokens.length === 0) {
     return { ok: false as const, sent: 0, error: 'push_tokens tablosunda geçerli expo_push_token bulunamadı.' }
   }
