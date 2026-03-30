@@ -56,6 +56,7 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
   {
     title: "Destek & İletişim",
     items: [
+      { icon: "bullhorn-outline", iconColor: "#D4AF37", title: "Duyurular", subtitle: "Tüm duyuruları görüntüle", route: "/announcements" },
       { icon: "email-outline", iconColor: "#3B82F6", title: "Bize Yazın", subtitle: "Öneri ve şikayetlerinizi iletin", route: "/contact" },
       { icon: "star-outline", iconColor: "#F59E0B", title: "Uygulamayı Değerlendir", subtitle: "App Store'da bizi değerlendirin", route: "rate" },
       { icon: "share-variant-outline", iconColor: "#10B981", title: "Arkadaşlarınla Paylaş", subtitle: "Ümmet'i sevdiklerinle paylaş", route: "share" },

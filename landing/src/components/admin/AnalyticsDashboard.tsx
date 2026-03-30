@@ -21,6 +21,7 @@ type Metrics = {
   }>
   sessions24h: number
   avgSessionMs24h: number
+  topScreens24h: Array<{ pathname: string; count: number }>
 }
 
 async function getMetrics(): Promise<Metrics> {
@@ -39,6 +40,7 @@ async function getMetrics(): Promise<Metrics> {
       cohortRows: [],
       sessions24h: 0,
       avgSessionMs24h: 0,
+      topScreens24h: [],
     }
   }
 
@@ -56,6 +58,7 @@ async function getMetrics(): Promise<Metrics> {
       { rows: retentionRows },
       { rows: cohortRows },
       { rows: sessionRows },
+      { rows: screenRows },
     ] =
       await Promise.all([
       pool.query(
@@ -162,6 +165,19 @@ async function getMetrics(): Promise<Metrics> {
           and duration_ms > 0;
         `,
       ),
+      pool.query(
+        `
+        select pathname, count(*)::int as count
+        from public.app_events
+        where ts >= now() - interval '1 day'
+          and name = 'screen_view'
+          and pathname is not null
+          and pathname <> ''
+        group by pathname
+        order by count desc
+        limit 8;
+        `,
+      ),
     ])
 
     const base = baseRows[0] || { dau: 0, wau: 0, mau: 0, events24h: 0 }
@@ -201,6 +217,7 @@ async function getMetrics(): Promise<Metrics> {
       }),
       sessions24h: Number(sessionRows?.[0]?.sessions_24h || 0),
       avgSessionMs24h: Number(sessionRows?.[0]?.avg_session_ms_24h || 0),
+      topScreens24h: (screenRows || []).map((r: any) => ({ pathname: String(r.pathname), count: Number(r.count) })),
     }
   } finally {
     await pool.end()
@@ -294,6 +311,43 @@ export default async function AnalyticsDashboard() {
                   {e.name}
                 </div>
                 <div style={{ fontWeight: 700 }}>{e.count}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          padding: 16,
+          border: '1px solid var(--theme-elevation-200)',
+          background: 'var(--theme-elevation-0)',
+          borderRadius: 8,
+        }}
+      >
+        <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 8 }}>En çok ekran (son 24s)</div>
+        {m.topScreens24h.length === 0 ? (
+          <div style={{ opacity: 0.7 }}>Henüz veri yok.</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+            {m.topScreens24h.map((s) => (
+              <div
+                key={s.pathname}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid var(--theme-elevation-100)',
+                  background: 'var(--theme-elevation-50)',
+                }}
+              >
+                <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }}>
+                  {s.pathname}
+                </div>
+                <div style={{ fontWeight: 700 }}>{s.count}</div>
               </div>
             ))}
           </div>

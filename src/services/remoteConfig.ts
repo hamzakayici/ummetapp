@@ -75,7 +75,9 @@ export async function getAnnouncementsCached(): Promise<Announcement[]> {
   return memoryAnn;
 }
 
-export async function refreshAnnouncements({ ttlMs = DEFAULT_TTL_MS, force = false }: { ttlMs?: number; force?: boolean } = {}) {
+export async function refreshAnnouncements(
+  { ttlMs = DEFAULT_TTL_MS, force = false, limit = 5 }: { ttlMs?: number; force?: boolean; limit?: number } = {}
+) {
   const last = await readTs(ANN_CACHE_TS_KEY);
   if (!force && last && Date.now() - last < ttlMs) return;
 
@@ -84,7 +86,7 @@ export async function refreshAnnouncements({ ttlMs = DEFAULT_TTL_MS, force = fal
     .from("announcements")
     .select("id,title,content,type")
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(Math.max(1, Math.min(50, Number(limit) || 5)));
 
   if (error) return;
 
