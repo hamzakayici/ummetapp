@@ -1,7 +1,49 @@
 import type { CollectionConfig } from 'payload'
 import { sendExpoPushAB, sendExpoPushToAll } from '../services/expoPush'
+import { Pool } from 'pg'
 
 type Status = 'draft' | 'sending' | 'sent' | 'failed'
+
+async function getOpenMetrics({
+  connectionString,
+  campaignId,
+}: {
+  connectionString: string
+  campaignId: string
+}): Promise<{ opensTotal: number; opensA: number; opensB: number }> {
+  const pool = new Pool({
+    connectionString,
+    ssl: connectionString.includes('pooler.supabase.com') ? false : { rejectUnauthorized: false },
+    max: 2,
+  })
+  try {
+    const { rows } = await pool.query(
+      `
+      select
+        count(*)::int as opens_total,
+        count(*) filter (where props->>'ab' = 'A')::int as opens_a,
+        count(*) filter (where props->>'ab' = 'B')::int as opens_b
+      from public.app_events
+      where name = 'push_open'
+        and props->>'campaign_id' = $1;
+      `,
+      [campaignId],
+    )
+    const r: any = rows?.[0] || {}
+    return {
+      opensTotal: Number(r.opens_total || 0),
+      opensA: Number(r.opens_a || 0),
+      opensB: Number(r.opens_b || 0),
+    }
+  } finally {
+    await pool.end()
+  }
+}
+
+function rate(opens: number, sent: number): number {
+  if (!sent || sent <= 0) return 0
+  return Math.max(0, Math.min(1, opens / sent))
+}
 
 export const PushNotifications: CollectionConfig = {
   slug: 'push_notifications',
@@ -176,6 +218,21 @@ export const PushNotifications: CollectionConfig = {
       admin: { readOnly: true },
     },
     {
+      name: 'open_count',
+      type: 'number',
+      label: 'Açılan (Toplam)',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'open_rate',
+      type: 'number',
+      label: 'Open Rate (Toplam)',
+      admin: {
+        readOnly: true,
+        description: '0-1 arası oran. Örn 0.12 = %12',
+      },
+    },
+    {
       name: 'sent_count_a',
       type: 'number',
       label: 'A Gönderilen',
@@ -188,6 +245,30 @@ export const PushNotifications: CollectionConfig = {
       admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
     },
     {
+      name: 'open_count_a',
+      type: 'number',
+      label: 'A Açılan',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
+      name: 'open_rate_a',
+      type: 'number',
+      label: 'A Open Rate',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
+      name: 'open_count_b',
+      type: 'number',
+      label: 'B Açılan',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
+      name: 'open_rate_b',
+      type: 'number',
+      label: 'B Open Rate',
+      admin: { readOnly: true, condition: (_, siblingData) => (siblingData as any)?.mode === 'ab' },
+    },
+    {
       name: 'error',
       type: 'textarea',
       label: 'Hata',
@@ -195,6 +276,28 @@ export const PushNotifications: CollectionConfig = {
     },
   ],
   hooks: {
+    afterRead: [
+      async ({ doc }) => {
+        const connectionString = process.env.DATABASE_URI || ''
+        if (!connectionString) return doc
+
+        const campaignId = `push_${String((doc as any).id)}`
+        const { opensTotal, opensA, opensB } = await getOpenMetrics({ connectionString, campaignId })
+
+        const sentTotal = Number((doc as any).sent_count || 0)
+        const sentA = Number((doc as any).sent_count_a || 0)
+        const sentB = Number((doc as any).sent_count_b || 0)
+
+        ;(doc as any).open_count = opensTotal
+        ;(doc as any).open_rate = Number(rate(opensTotal, sentTotal).toFixed(4))
+        ;(doc as any).open_count_a = opensA
+        ;(doc as any).open_rate_a = Number(rate(opensA, sentA).toFixed(4))
+        ;(doc as any).open_count_b = opensB
+        ;(doc as any).open_rate_b = Number(rate(opensB, sentB).toFixed(4))
+
+        return doc
+      },
+    ],
     afterChange: [
       async ({ doc, req, operation }) => {
         const ctx = (req as any).context || ((req as any).context = {})

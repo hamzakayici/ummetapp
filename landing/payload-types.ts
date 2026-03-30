@@ -250,8 +250,17 @@ export interface PushNotification {
   status?: ('draft' | 'sending' | 'sent' | 'failed') | null;
   sent_at?: string | null;
   sent_count?: number | null;
+  open_count?: number | null;
+  /**
+   * 0-1 arası oran. Örn 0.12 = %12
+   */
+  open_rate?: number | null;
   sent_count_a?: number | null;
   sent_count_b?: number | null;
+  open_count_a?: number | null;
+  open_rate_a?: number | null;
+  open_count_b?: number | null;
+  open_rate_b?: number | null;
   error?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -514,8 +523,14 @@ export interface PushNotificationsSelect<T extends boolean = true> {
   status?: T;
   sent_at?: T;
   sent_count?: T;
+  open_count?: T;
+  open_rate?: T;
   sent_count_a?: T;
   sent_count_b?: T;
+  open_count_a?: T;
+  open_rate_a?: T;
+  open_count_b?: T;
+  open_rate_b?: T;
   error?: T;
   updatedAt?: T;
   createdAt?: T;
