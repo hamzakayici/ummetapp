@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { Users } from './src/collections/Users';
 import { SharedDhikrs } from './src/collections/SharedDhikrs';
 import { PushTokens } from './src/collections/PushTokens';
+import { PushNotifications } from './src/collections/PushNotifications';
 import { Announcements } from './src/collections/Announcements';
 import { AppSettings } from './src/collections/AppSettings';
 import { AppDevices } from './src/collections/AppDevices';
@@ -51,6 +52,7 @@ export default buildConfig({
     Users,
     SharedDhikrs,
     PushTokens,
+    PushNotifications,
     Announcements,
     AppSettings,
     AppDevices,

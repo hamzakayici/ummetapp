@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     shared_dhikrs: SharedDhikr;
     push_tokens: PushToken;
+    push_notifications: PushNotification;
     announcements: Announcement;
     app_settings: AppSetting;
     app_devices: AppDevice;
@@ -85,6 +86,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     shared_dhikrs: SharedDhikrsSelect<false> | SharedDhikrsSelect<true>;
     push_tokens: PushTokensSelect<false> | PushTokensSelect<true>;
+    push_notifications: PushNotificationsSelect<false> | PushNotificationsSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     app_settings: AppSettingsSelect<false> | AppSettingsSelect<true>;
     app_devices: AppDevicesSelect<false> | AppDevicesSelect<true>;
@@ -177,6 +179,38 @@ export interface PushToken {
   id: number;
   expo_push_token: string;
   platform?: ('ios' | 'android' | 'web') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push_notifications".
+ */
+export interface PushNotification {
+  id: number;
+  title: string;
+  body: string;
+  platform?: ('all' | 'ios' | 'android') | null;
+  /**
+   * Mobil uygulama içinde yönlendirme vb. için JSON gönderebilirsiniz.
+   */
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Kaydedince gönderim tetiklenir.
+   */
+  send_now?: boolean | null;
+  status?: ('draft' | 'sending' | 'sent' | 'failed') | null;
+  sent_at?: string | null;
+  sent_count?: number | null;
+  error?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -297,6 +331,10 @@ export interface PayloadLockedDocument {
         value: number | PushToken;
       } | null)
     | ({
+        relationTo: 'push_notifications';
+        value: number | PushNotification;
+      } | null)
+    | ({
         relationTo: 'announcements';
         value: number | Announcement;
       } | null)
@@ -401,6 +439,23 @@ export interface SharedDhikrsSelect<T extends boolean = true> {
 export interface PushTokensSelect<T extends boolean = true> {
   expo_push_token?: T;
   platform?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push_notifications_select".
+ */
+export interface PushNotificationsSelect<T extends boolean = true> {
+  title?: T;
+  body?: T;
+  platform?: T;
+  data?: T;
+  send_now?: T;
+  status?: T;
+  sent_at?: T;
+  sent_count?: T;
+  error?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, Dimensions, ScrollView, TextInput, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +13,8 @@ import ConfettiCannon from "react-native-confetti-cannon";
 import { useDhikrStore, useSharedDhikrStore } from "../../src/stores/appStore";
 import { supabase } from "../../src/services/supabase";
 import { getSharedDhikrByCode, createSharedDhikr } from "../../src/services/sharedDhikr";
+import { getRemoteConfigCached } from "../../src/services/remoteConfig";
+import { analyticsTrack } from "../../src/services/analytics";
 
 const { width } = Dimensions.get("window");
 const CIRCLE_SIZE = width * 0.55;
@@ -48,6 +50,12 @@ export default function DhikrScreen() {
   const [count, setCount] = useState(0);
   const { incrementDaily, getTodayCount } = useDhikrStore();
   const totalToday = getTodayCount();
+  const [dailyGoalEnabled, setDailyGoalEnabled] = useState(false);
+  const [dailyGoal, setDailyGoal] = useState<number>(0);
+  const dailyGoalReachedRef = useRef(false);
+
+  const dailyGoalProgress =
+    dailyGoalEnabled && dailyGoal > 0 ? Math.min((totalToday / dailyGoal) * 100, 100) : 0;
 
   const target = PRESETS[selectedPreset].target;
   const progress = Math.min((count / target) * 100, 100);
@@ -95,6 +103,21 @@ export default function DhikrScreen() {
     return () => { supabase.removeChannel(room); };
   }, []);
 
+  useEffect(() => {
+    // Remote-config ile "günlük hedef" yönetimi
+    // app_settings:
+    // - daily_dhikr_goal_enabled = "true" | "false"
+    // - daily_dhikr_goal_default = "100" (örnek)
+    void getRemoteConfigCached().then((rc) => {
+      const enabled = String(rc["daily_dhikr_goal_enabled"] ?? "").toLowerCase() === "true";
+      const goalRaw = rc["daily_dhikr_goal_default"];
+      const goal = Math.max(0, Number.parseInt(String(goalRaw ?? "0"), 10) || 0);
+      setDailyGoalEnabled(enabled && goal > 0);
+      setDailyGoal(goal);
+      if (!enabled) dailyGoalReachedRef.current = false;
+    });
+  }, []);
+
   const scaleValue = useSharedValue(1);
   const buttonStyle = useAnimatedStyle(() => ({ transform: [{ scale: scaleValue.value }] }));
 
@@ -131,6 +154,14 @@ export default function DhikrScreen() {
       return next;
     });
     incrementDaily(1);
+
+    if (dailyGoalEnabled && dailyGoal > 0 && !dailyGoalReachedRef.current) {
+      const nextTotal = totalToday + 1;
+      if (nextTotal >= dailyGoal) {
+        dailyGoalReachedRef.current = true;
+        void analyticsTrack({ name: "daily_goal_reached", props: { dailyGoal, nextTotal } });
+      }
+    }
   }, [target]);
 
   const handleReset = useCallback(() => {
@@ -206,6 +237,36 @@ export default function DhikrScreen() {
               </View>
             </View>
           </View>
+
+          {activeTab === "personal" && dailyGoalEnabled && dailyGoal > 0 && (
+            <Animated.View
+              entering={FadeInDown.delay(160).springify()}
+              style={{
+                marginTop: 12,
+                backgroundColor: "rgba(212,175,55,0.08)",
+                borderRadius: 12,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                borderWidth: 1,
+                borderColor: "rgba(212,175,55,0.18)",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <MaterialCommunityIcons name="target" size={16} color="#D4AF37" />
+                  <Text style={{ color: "#ECDFCC", fontSize: 13, fontWeight: "700" }}>
+                    Günlük Hedef: {dailyGoal}
+                  </Text>
+                </View>
+                <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "700" }}>
+                  %{dailyGoalProgress.toFixed(0)}
+                </Text>
+              </View>
+              <View style={{ marginTop: 8, height: 4, borderRadius: 2, backgroundColor: "rgba(212,175,55,0.14)" }}>
+                <Animated.View style={{ height: 4, borderRadius: 2, backgroundColor: "#D4AF37", width: `${dailyGoalProgress}%` }} />
+              </View>
+            </Animated.View>
+          )}
 
           {/* TABS (Kişisel / Ortak) */}
           <View style={{ flexDirection: "row", marginTop: 20, backgroundColor: "rgba(27,67,50,0.5)", borderRadius: 12, padding: 4 }}>
