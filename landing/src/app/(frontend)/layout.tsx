@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "../globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import "@mantine/core/styles.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 export const metadata: Metadata = {
   title: { default: "Ümmet — İslami Yaşam Asistanınız", template: "%s | Ümmet" },
@@ -16,11 +18,22 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript defaultColorScheme="dark" />
+      </head>
       <body>
-        <div className="bg-glow" />
-        <Navbar />
-        {children}
-        <Footer />
+        <MantineProvider
+          defaultColorScheme="dark"
+          theme={{
+            primaryColor: "teal",
+            fontFamily: "Inter, -apple-system, system-ui, Segoe UI, sans-serif",
+          }}
+        >
+          <div className="bg-glow" />
+          <Navbar />
+          {children}
+          <Footer />
+        </MantineProvider>
       </body>
     </html>
   );
