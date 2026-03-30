@@ -83,7 +83,7 @@ export async function refreshAnnouncements({ ttlMs = DEFAULT_TTL_MS, force = fal
   const { data, error } = await supabase
     .from("announcements")
     .select("id,title,content,type")
-    .order("createdAt", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(5);
 
   if (error) return;

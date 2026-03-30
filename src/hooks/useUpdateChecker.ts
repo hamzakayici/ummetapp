@@ -1,8 +1,7 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback } from "react";
 import { Alert, Platform, Linking, AppState } from "react-native";
 import * as Updates from "expo-updates";
 import * as Application from "expo-application";
-import { getRemoteConfigCached, refreshRemoteConfig } from "../services/remoteConfig";
 
 const APP_STORE_ID = "6760871547";
 const STORE_URL = Platform.select({
@@ -20,8 +19,6 @@ const STORE_URL = Platform.select({
  *    kullanıcıya "Yeni sürüm var" popup'ı gösterir.
  */
 export function useUpdateChecker() {
-  const forceUpdateShownRef = useRef(false);
-
   // OTA güncelleme kontrolü
   const checkOTAUpdate = useCallback(async () => {
     if (__DEV__) return; // Development modunda çalışmaz
@@ -36,52 +33,6 @@ export function useUpdateChecker() {
       }
     } catch {
       // Sessizce devam et — güncelleme kontrolü başarısız olursa uygulamayı bozmamalı
-    }
-  }, []);
-
-  // Admin'den yönetilen "minimum sürüm" kontrolü (zorunlu güncelleme)
-  const checkForcedUpdate = useCallback(async () => {
-    if (__DEV__) return;
-
-    try {
-      // Remote config'i mümkünse hemen güncelle
-      await refreshRemoteConfig({ force: true });
-      const rc = await getRemoteConfigCached();
-
-      const minVersion = String(rc["min_required_version"] ?? "").trim();
-      const forceEnabled = String(rc["force_update_enabled"] ?? "").toLowerCase() === "true";
-      const message =
-        String(rc["force_update_message"] ?? "").trim() ||
-        "Yeni sürüm yayınlandı. Devam edebilmek için lütfen uygulamayı güncelleyin.";
-
-      if (!forceEnabled || !minVersion) return;
-
-      const currentVersion = Application.nativeApplicationVersion;
-      if (!currentVersion) return;
-
-      // minVersion > currentVersion ise güncelleme zorunlu
-      const needsUpdate = isNewerVersion(minVersion, currentVersion);
-      if (!needsUpdate) {
-        forceUpdateShownRef.current = false;
-        return;
-      }
-
-      if (forceUpdateShownRef.current) return;
-      forceUpdateShownRef.current = true;
-
-      Alert.alert(
-        "Güncelleme Gerekli",
-        message,
-        [
-          {
-            text: "Güncelle",
-            onPress: () => Linking.openURL(STORE_URL),
-          },
-        ],
-        { cancelable: false }
-      );
-    } catch {
-      // Sessizce devam et
     }
   }, []);
 
@@ -124,19 +75,17 @@ export function useUpdateChecker() {
   useEffect(() => {
     // Uygulama açıldığında kontrol et
     checkOTAUpdate();
-    checkForcedUpdate();
     checkStoreUpdate();
 
     // Uygulama arka plandan ön plana geldiğinde tekrar kontrol et
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active") {
         checkOTAUpdate();
-        checkForcedUpdate();
       }
     });
 
     return () => subscription.remove();
-  }, [checkOTAUpdate, checkForcedUpdate, checkStoreUpdate]);
+  }, [checkOTAUpdate, checkStoreUpdate]);
 }
 
 /**

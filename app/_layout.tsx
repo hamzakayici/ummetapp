@@ -2,7 +2,7 @@ import "../global.css";
 import { useEffect, useRef } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import * as Notifications from "expo-notifications";
 import { playEzan, stopEzan } from "../src/services/audioService";
 import { registerPushToken } from "../src/services/pushTokenService";
@@ -34,11 +34,13 @@ import * as SplashScreen from "expo-splash-screen";
 import { usePathname } from "expo-router";
 import { analyticsStartSession, analyticsTrack } from "../src/services/analytics";
 import { refreshAnnouncements, refreshRemoteConfig } from "../src/services/remoteConfig";
+import { useForcedUpdate } from "../src/hooks/useForcedUpdate";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const pathname = usePathname();
+  const forced = useForcedUpdate();
   const [fontsLoaded, fontError] = useFonts({
     Amiri_400Regular,
     Amiri_400Regular_Italic,
@@ -117,6 +119,52 @@ export default function RootLayout() {
     return (
       <View className="flex-1 bg-bg items-center justify-center">
         <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  if (forced.required) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#0A0F14", paddingHorizontal: 22, justifyContent: "center" }}>
+        <View
+          style={{
+            padding: 18,
+            borderRadius: 18,
+            borderWidth: 1,
+            borderColor: "rgba(212,175,55,0.22)",
+            backgroundColor: "rgba(18, 26, 36, 0.75)",
+          }}
+        >
+          <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "800", letterSpacing: 1, marginBottom: 10 }}>
+            GÜNCELLEME GEREKLİ
+          </Text>
+          <Text style={{ color: "#ECDFCC", fontSize: 20, fontWeight: "800", marginBottom: 10 }}>
+            Yeni sürüme geç
+          </Text>
+          <Text style={{ color: "#8A9BA8", fontSize: 14, lineHeight: 20 }}>
+            {forced.message}
+          </Text>
+          {forced.minVersion ? (
+            <Text style={{ color: "#5A6B78", fontSize: 12, marginTop: 10 }}>
+              Minimum sürüm: {forced.minVersion}
+            </Text>
+          ) : null}
+
+          <TouchableOpacity
+            onPress={forced.openStore}
+            activeOpacity={0.85}
+            style={{
+              marginTop: 16,
+              height: 48,
+              borderRadius: 14,
+              backgroundColor: "#D4AF37",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: "#0A0F14", fontSize: 14, fontWeight: "800" }}>Güncelle</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
