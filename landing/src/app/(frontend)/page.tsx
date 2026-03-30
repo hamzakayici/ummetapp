@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Clock, BookOpen, HandHelping, Circle, Compass, Moon, MapPin, Library, Calculator, Shield, Gem, Palette, Smartphone, Wifi, Zap, Star, Download } from "lucide-react";
+import { Badge, Box, Button, Card, Container, Divider, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 
 export const metadata: Metadata = {
   title: "Ümmet — İslami Yaşam Asistanınız | Namaz Vakitleri, Kuran, Dua",
@@ -46,18 +47,63 @@ export default function Home() {
     <>
       {/* HERO */}
       <section className="hero" id="hero">
-        <div className="hero-content">
-          <div className="hero-badge"><Moon size={14} /> App Store&apos;da Ücretsiz</div>
-          <h1>İslami Yaşamınız İçin Tek Uygulama</h1>
-          <p>Namaz vakitleri, Kuran okuma, dua, zikir, kıble pusulası, yakındaki camiler, hicri takvim ve daha fazlası — hepsi <strong>Ümmet</strong>&apos;te.</p>
-          <div className="hero-buttons">
-            <a href="https://apps.apple.com/tr/app/ummet/id6760871547" target="_blank" rel="noopener noreferrer" className="btn-primary"><AppleIcon /> App Store&apos;dan İndir</a>
-            <Link href="/ozellikler" className="btn-secondary">Tüm Özellikleri Keşfet →</Link>
-          </div>
-          <p className="hero-trust">
-            <span><Star size={12} style={{ display: "inline", verticalAlign: "-2px" }} /> 4.9 Puan</span> · <span>100% Ücretsiz</span> · <span>Reklamsız</span> · <span>Gizlilik Öncelikli</span>
-          </p>
-        </div>
+        <Container size="md">
+          <Stack align="center" gap="lg">
+            <Badge
+              leftSection={<Moon size={14} />}
+              variant="light"
+              color="yellow"
+              radius="xl"
+              styles={{
+                root: { background: "var(--gold-dim)", border: "1px solid rgba(212,175,55,0.25)", color: "var(--gold)" },
+              }}
+            >
+              App Store&apos;da Ücretsiz
+            </Badge>
+
+            <Title order={1} ta="center" style={{ fontWeight: 900, lineHeight: 1.05, maxWidth: 900 }}>
+              İslami Yaşamınız İçin Tek Uygulama
+            </Title>
+
+            <Text ta="center" c="dimmed" style={{ maxWidth: 640, fontSize: 18, lineHeight: 1.7 }}>
+              Namaz vakitleri, Kuran okuma, dua, zikir, kıble pusulası, yakındaki camiler, hicri takvim ve daha fazlası — hepsi{" "}
+              <strong>Ümmet</strong>&apos;te.
+            </Text>
+
+            <Group gap="sm" justify="center" wrap="wrap">
+              <Button
+                component="a"
+                href="https://apps.apple.com/tr/app/ummet/id6760871547"
+                target="_blank"
+                rel="noopener noreferrer"
+                radius="lg"
+                size="md"
+                leftSection={<AppleIcon />}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, var(--green-dark), var(--green-mid))",
+                    border: "1px solid rgba(64,192,87,0.2)",
+                  },
+                }}
+              >
+                App Store&apos;dan İndir
+              </Button>
+
+              <Link href="/ozellikler" className="btn-secondary">
+                Tüm Özellikleri Keşfet →
+              </Link>
+            </Group>
+
+            <Text ta="center" style={{ fontSize: 13, color: "var(--text-muted)" }}>
+              <span style={{ color: "var(--text-dim)" }}>
+                <Star size={12} style={{ display: "inline", verticalAlign: "-2px" }} /> 4.9 Puan
+              </span>{" "}
+              · <span style={{ color: "var(--text-dim)" }}>100% Ücretsiz</span> ·{" "}
+              <span style={{ color: "var(--text-dim)" }}>Reklamsız</span> ·{" "}
+              <span style={{ color: "var(--text-dim)" }}>Gizlilik Öncelikli</span>
+            </Text>
+          </Stack>
+        </Container>
       </section>
 
       {/* BESMELE */}
@@ -69,52 +115,122 @@ export default function Home() {
 
       {/* FEATURES */}
       <section id="features">
-        <div className="section-inner">
-          <div className="section-header">
-            <span className="section-label">Özellikler</span>
-            <h2 className="section-title">İhtiyacınız Olan Her Şey, Tek Uygulamada</h2>
-            <p className="section-desc">Günlük ibadetlerinizi kolaylaştıran, modern ve kullanıcı dostu 15+ araç.</p>
-          </div>
-          <div className="features-grid">
-            {FEATURES.map(f => (
-              <div className="feature-card" key={f.title}>
-                <div className="feature-icon" style={{ background: f.bg, color: f.color }}>{f.icon}</div>
-                <h3>{f.title}</h3>
-                <p>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ textAlign: "center", marginTop: 40 }}>
-            <Link href="/ozellikler" className="btn-secondary">Tüm 15+ Özelliği Gör →</Link>
-          </div>
-        </div>
+        <Container size="lg">
+          <Stack gap="xl">
+            <Stack align="center" gap="sm">
+              <Text tt="uppercase" fw={800} style={{ letterSpacing: 2, color: "var(--gold)", fontSize: 12 }}>
+                Özellikler
+              </Text>
+              <Title order={2} ta="center">
+                İhtiyacınız Olan Her Şey, Tek Uygulamada
+              </Title>
+              <Text ta="center" c="dimmed" style={{ maxWidth: 720 }}>
+                Günlük ibadetlerinizi kolaylaştıran, modern ve kullanıcı dostu 15+ araç.
+              </Text>
+            </Stack>
+
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+              {FEATURES.map((f) => (
+                <Card
+                  key={f.title}
+                  radius="lg"
+                  padding="lg"
+                  withBorder
+                  styles={{
+                    root: {
+                      background: "var(--bg-card)",
+                      borderColor: "rgba(255,255,255,0.06)",
+                    },
+                  }}
+                >
+                  <Group gap="md" align="flex-start">
+                    <Box
+                      style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 16,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: f.bg,
+                        color: f.color,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {f.icon}
+                    </Box>
+                    <Box>
+                      <Text fw={800} style={{ fontSize: 16, marginBottom: 6 }}>
+                        {f.title}
+                      </Text>
+                      <Text c="dimmed" style={{ fontSize: 13, lineHeight: 1.7 }}>
+                        {f.desc}
+                      </Text>
+                    </Box>
+                  </Group>
+                </Card>
+              ))}
+            </SimpleGrid>
+
+            <Group justify="center">
+              <Link href="/ozellikler" className="btn-secondary">
+                Tüm 15+ Özelliği Gör →
+              </Link>
+            </Group>
+          </Stack>
+        </Container>
       </section>
 
       {/* STATS */}
-      <div className="stats-bar section-inner">
+      <Container size="lg" className="stats-bar section-inner">
         <div className="stat"><div className="stat-num">6</div><div className="stat-label">Vakit Bildirimi</div></div>
         <div className="stat"><div className="stat-num">114</div><div className="stat-label">Sure</div></div>
         <div className="stat"><div className="stat-num">100+</div><div className="stat-label">Dua</div></div>
         <div className="stat"><div className="stat-num">15+</div><div className="stat-label">Özellik</div></div>
-      </div>
+      </Container>
 
       {/* WHY */}
       <section>
-        <div className="section-inner">
-          <div className="section-header">
-            <span className="section-label">Neden Ümmet?</span>
-            <h2 className="section-title">Fark Yaratan Özellikler</h2>
-          </div>
-          <div className="why-grid">
-            {WHY.map(w => (
-              <div className="why-card" key={w.title}>
-                <div className="why-icon" style={{ color: w.color }}>{w.icon}</div>
-                <h3>{w.title}</h3>
-                <p>{w.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Container size="lg">
+          <Stack gap="xl">
+            <Stack align="center" gap="sm">
+              <Text tt="uppercase" fw={800} style={{ letterSpacing: 2, color: "var(--gold)", fontSize: 12 }}>
+                Neden Ümmet?
+              </Text>
+              <Title order={2} ta="center">
+                Fark Yaratan Özellikler
+              </Title>
+            </Stack>
+
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+              {WHY.map((w) => (
+                <Card
+                  key={w.title}
+                  radius="lg"
+                  padding="lg"
+                  withBorder
+                  styles={{
+                    root: {
+                      background: "var(--bg-card)",
+                      borderColor: "rgba(255,255,255,0.06)",
+                      textAlign: "center",
+                    },
+                  }}
+                >
+                  <Box style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: w.color }}>
+                    {w.icon}
+                  </Box>
+                  <Text fw={800} style={{ fontSize: 15, marginBottom: 6 }}>
+                    {w.title}
+                  </Text>
+                  <Text c="dimmed" style={{ fontSize: 13, lineHeight: 1.6 }}>
+                    {w.desc}
+                  </Text>
+                </Card>
+              ))}
+            </SimpleGrid>
+          </Stack>
+        </Container>
       </section>
 
       {/* HOW */}
@@ -134,21 +250,50 @@ export default function Home() {
 
       {/* REVIEWS */}
       <section>
-        <div className="section-inner">
-          <div className="section-header">
-            <span className="section-label">Kullanıcı Yorumları</span>
-            <h2 className="section-title">Ümmet Ailesi Ne Diyor?</h2>
-          </div>
-          <div className="testimonials-grid">
-            {REVIEWS.map(r => (
-              <div className="testimonial" key={r.author}>
-                <div className="testimonial-stars"><Star size={14} fill="var(--gold)" /><Star size={14} fill="var(--gold)" /><Star size={14} fill="var(--gold)" /><Star size={14} fill="var(--gold)" /><Star size={14} fill="var(--gold)" /></div>
-                <p>&quot;{r.text}&quot;</p>
-                <span className="testimonial-author">— {r.author}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Container size="lg">
+          <Stack gap="xl">
+            <Stack align="center" gap="sm">
+              <Text tt="uppercase" fw={800} style={{ letterSpacing: 2, color: "var(--gold)", fontSize: 12 }}>
+                Kullanıcı Yorumları
+              </Text>
+              <Title order={2} ta="center">
+                Ümmet Ailesi Ne Diyor?
+              </Title>
+            </Stack>
+
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+              {REVIEWS.map((r) => (
+                <Card
+                  key={r.author}
+                  radius="lg"
+                  padding="lg"
+                  withBorder
+                  styles={{
+                    root: {
+                      background: "var(--bg-card)",
+                      borderColor: "rgba(255,255,255,0.06)",
+                    },
+                  }}
+                >
+                  <Group gap={4} style={{ color: "var(--gold)" }}>
+                    <Star size={14} fill="var(--gold)" />
+                    <Star size={14} fill="var(--gold)" />
+                    <Star size={14} fill="var(--gold)" />
+                    <Star size={14} fill="var(--gold)" />
+                    <Star size={14} fill="var(--gold)" />
+                  </Group>
+                  <Text c="dimmed" style={{ marginTop: 10, fontStyle: "italic", lineHeight: 1.7 }}>
+                    &quot;{r.text}&quot;
+                  </Text>
+                  <Divider my="md" opacity={0.4} />
+                  <Text fw={700} style={{ fontSize: 13 }}>
+                    — {r.author}
+                  </Text>
+                </Card>
+              ))}
+            </SimpleGrid>
+          </Stack>
+        </Container>
       </section>
 
       {/* FAQ PREVIEW */}
@@ -171,10 +316,36 @@ export default function Home() {
 
       {/* CTA */}
       <section className="cta-section" id="download">
-        <span className="section-label"><Download size={14} style={{ display: "inline", verticalAlign: "-2px" }} /> Ücretsiz İndirin</span>
-        <h2>İslami Yaşamınıza Güç Katın</h2>
-        <p>Ümmet ile her an ibadetinize yoldaş olun. Kayıt gerektirmez, reklam yoktur.</p>
-        <a href="https://apps.apple.com/tr/app/ummet/id6760871547" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: "inline-flex" }}><AppleIcon /> App Store&apos;dan İndir</a>
+        <Container size="sm">
+          <Stack align="center" gap="md">
+            <Text tt="uppercase" fw={800} style={{ letterSpacing: 2, color: "var(--gold)", fontSize: 12 }}>
+              <Download size={14} style={{ display: "inline", verticalAlign: "-2px" }} /> Ücretsiz İndirin
+            </Text>
+            <Title order={2} ta="center">
+              İslami Yaşamınıza Güç Katın
+            </Title>
+            <Text ta="center" c="dimmed">
+              Ümmet ile her an ibadetinize yoldaş olun. Kayıt gerektirmez, reklam yoktur.
+            </Text>
+            <Button
+              component="a"
+              href="https://apps.apple.com/tr/app/ummet/id6760871547"
+              target="_blank"
+              rel="noopener noreferrer"
+              radius="lg"
+              size="md"
+              leftSection={<AppleIcon />}
+              styles={{
+                root: {
+                  background: "linear-gradient(135deg, var(--green-dark), var(--green-mid))",
+                  border: "1px solid rgba(64,192,87,0.2)",
+                },
+              }}
+            >
+              App Store&apos;dan İndir
+            </Button>
+          </Stack>
+        </Container>
       </section>
     </>
   );
