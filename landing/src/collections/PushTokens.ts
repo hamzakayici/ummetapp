@@ -8,6 +8,13 @@ export const PushTokens: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'expo_push_token',
+    defaultColumns: ['expo_push_token', 'platform', 'app_version', 'last_seen_at', 'updatedAt'],
+  },
+  access: {
+    read: ({ req }) => Boolean(req.user),
+    create: () => false,
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
   },
   fields: [
     {

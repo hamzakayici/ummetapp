@@ -53,7 +53,13 @@ export const PushNotifications: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'platform', 'status', 'sent_at', 'updatedAt'],
+    defaultColumns: ['title', 'mode', 'segment', 'platform', 'status', 'sent_count', 'open_rate', 'sent_at'],
+  },
+  access: {
+    read: ({ req }) => Boolean(req.user),
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
   },
   fields: [
     {
