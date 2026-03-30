@@ -89,9 +89,9 @@ export default function Home() {
                 App Store&apos;dan İndir
               </Button>
 
-              <Link href="/ozellikler" className="btn-secondary">
+              <Button component="a" href="/ozellikler" variant="default" radius="lg" size="md">
                 Tüm Özellikleri Keşfet →
-              </Link>
+              </Button>
             </Group>
 
             <Text ta="center" style={{ fontSize: 13, color: "var(--text-muted)" }}>
@@ -173,9 +173,9 @@ export default function Home() {
             </SimpleGrid>
 
             <Group justify="center">
-              <Link href="/ozellikler" className="btn-secondary">
+              <Button component="a" href="/ozellikler" variant="default" radius="lg">
                 Tüm 15+ Özelliği Gör →
-              </Link>
+              </Button>
             </Group>
           </Stack>
         </Container>
