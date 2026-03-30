@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { getAnnouncementsCached, refreshAnnouncements, type Announcement } from "../../src/services/remoteConfig";
 
 const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 85 : 65;
 
@@ -131,6 +133,21 @@ function MenuItemComponent({ item, index, sectionIndex }: { item: MenuItem; inde
 
 export default function MoreScreen() {
   const insets = useSafeAreaInsets();
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const cached = await getAnnouncementsCached();
+      if (!cancelled) setAnnouncements(cached);
+      await refreshAnnouncements();
+      const fresh = await getAnnouncementsCached();
+      if (!cancelled) setAnnouncements(fresh);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <View className="flex-1 bg-bg">
@@ -143,6 +160,36 @@ export default function MoreScreen() {
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 16 }}>
+        {announcements.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(150).springify()}>
+            <View
+              style={{
+                marginTop: 16,
+                marginHorizontal: 20,
+                padding: 14,
+                borderRadius: 16,
+                backgroundColor: "rgba(18, 26, 36, 0.7)",
+                borderWidth: 1,
+                borderColor: "rgba(212,175,55,0.18)",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <MaterialCommunityIcons name="bullhorn-outline" size={16} color="#D4AF37" />
+                <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "800", marginLeft: 8 }}>
+                  Duyuru
+                </Text>
+              </View>
+              <Text style={{ color: "#ECDFCC", fontSize: 14, fontWeight: "700", marginTop: 8 }}>
+                {announcements[0].title}
+              </Text>
+              {!!announcements[0].content && (
+                <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 6, lineHeight: 18 }}>
+                  {announcements[0].content}
+                </Text>
+              )}
+            </View>
+          </Animated.View>
+        )}
 
         {/* Menu Sections */}
         {MENU_SECTIONS.map((section, sectionIndex) => (

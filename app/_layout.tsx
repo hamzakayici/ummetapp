@@ -33,6 +33,7 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { usePathname } from "expo-router";
 import { analyticsStartSession, analyticsTrack } from "../src/services/analytics";
+import { refreshAnnouncements, refreshRemoteConfig } from "../src/services/remoteConfig";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -66,6 +67,9 @@ export default function RootLayout() {
       void analyticsStartSession().then(() => {
         void analyticsTrack({ name: "app_open" });
       });
+      // Remote config + announcements (admin yönetimi)
+      void refreshRemoteConfig();
+      void refreshAnnouncements();
     }
   }, [fontsLoaded, fontError]);
 
