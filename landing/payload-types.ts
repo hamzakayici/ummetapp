@@ -72,6 +72,9 @@ export interface Config {
     push_tokens: PushToken;
     announcements: Announcement;
     app_settings: AppSetting;
+    app_devices: AppDevice;
+    app_sessions: AppSession;
+    app_events: AppEvent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +87,9 @@ export interface Config {
     push_tokens: PushTokensSelect<false> | PushTokensSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     app_settings: AppSettingsSelect<false> | AppSettingsSelect<true>;
+    app_devices: AppDevicesSelect<false> | AppDevicesSelect<true>;
+    app_sessions: AppSessionsSelect<false> | AppSessionsSelect<true>;
+    app_events: AppEventsSelect<false> | AppEventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -201,6 +207,61 @@ export interface AppSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_devices".
+ */
+export interface AppDevice {
+  id: number;
+  device_id: string;
+  platform?: ('ios' | 'android' | 'web' | 'other') | null;
+  app_version?: string | null;
+  first_seen_at?: string | null;
+  last_seen_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_sessions".
+ */
+export interface AppSession {
+  id: number;
+  session_id: string;
+  device_id: string;
+  started_at: string;
+  ended_at?: string | null;
+  duration_ms?: number | null;
+  app_version?: string | null;
+  platform?: ('ios' | 'android' | 'web' | 'other') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_events".
+ */
+export interface AppEvent {
+  id: number;
+  name: string;
+  ts: string;
+  device_id: string;
+  session_id?: string | null;
+  platform?: ('ios' | 'android' | 'web' | 'other') | null;
+  app_version?: string | null;
+  pathname?: string | null;
+  props?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -242,6 +303,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'app_settings';
         value: number | AppSetting;
+      } | null)
+    | ({
+        relationTo: 'app_devices';
+        value: number | AppDevice;
+      } | null)
+    | ({
+        relationTo: 'app_sessions';
+        value: number | AppSession;
+      } | null)
+    | ({
+        relationTo: 'app_events';
+        value: number | AppEvent;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -351,6 +424,50 @@ export interface AppSettingsSelect<T extends boolean = true> {
   key?: T;
   value?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_devices_select".
+ */
+export interface AppDevicesSelect<T extends boolean = true> {
+  device_id?: T;
+  platform?: T;
+  app_version?: T;
+  first_seen_at?: T;
+  last_seen_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_sessions_select".
+ */
+export interface AppSessionsSelect<T extends boolean = true> {
+  session_id?: T;
+  device_id?: T;
+  started_at?: T;
+  ended_at?: T;
+  duration_ms?: T;
+  app_version?: T;
+  platform?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app_events_select".
+ */
+export interface AppEventsSelect<T extends boolean = true> {
+  name?: T;
+  ts?: T;
+  device_id?: T;
+  session_id?: T;
+  platform?: T;
+  app_version?: T;
+  pathname?: T;
+  props?: T;
   updatedAt?: T;
   createdAt?: T;
 }

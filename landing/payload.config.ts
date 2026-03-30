@@ -9,6 +9,9 @@ import { SharedDhikrs } from './src/collections/SharedDhikrs';
 import { PushTokens } from './src/collections/PushTokens';
 import { Announcements } from './src/collections/Announcements';
 import { AppSettings } from './src/collections/AppSettings';
+import { AppDevices } from './src/collections/AppDevices';
+import { AppSessions } from './src/collections/AppSessions';
+import { AppEvents } from './src/collections/AppEvents';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -39,6 +42,9 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      beforeDashboard: ['/src/components/admin/AnalyticsDashboard'],
+    },
   },
   collections: [
     Users,
@@ -46,6 +52,9 @@ export default buildConfig({
     PushTokens,
     Announcements,
     AppSettings,
+    AppDevices,
+    AppSessions,
+    AppEvents,
   ],
   editor: lexicalEditor(),
   secret: payloadSecret,

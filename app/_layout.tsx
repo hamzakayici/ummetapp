@@ -31,10 +31,13 @@ import {
   NotoNaskhArabic_700Bold,
 } from "@expo-google-fonts/noto-naskh-arabic";
 import * as SplashScreen from "expo-splash-screen";
+import { usePathname } from "expo-router";
+import { analyticsStartSession, analyticsTrack } from "../src/services/analytics";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const pathname = usePathname();
   const [fontsLoaded, fontError] = useFonts({
     Amiri_400Regular,
     Amiri_400Regular_Italic,
@@ -59,8 +62,17 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
       // Push token'ı Supabase'e kaydet (arka planda)
       registerPushToken();
+      // Analytics: session + app_open
+      void analyticsStartSession().then(() => {
+        void analyticsTrack({ name: "app_open" });
+      });
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    if (!pathname) return;
+    void analyticsTrack({ name: "screen_view", pathname });
+  }, [pathname]);
 
   // ─── Ezan Bildirim Listener ───
   // Kilitli ekran: bildirim kendi .wav sesiyle 29s ezan çalıyor (iOS limiti).
