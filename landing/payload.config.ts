@@ -45,7 +45,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ['/src/components/admin/AnalyticsDashboard'],
+      beforeDashboard: ['/src/components/admin/AnalyticsDashboard', '/src/components/admin/QuickPushSender'],
     },
   },
   collections: [
