@@ -12,7 +12,10 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "ios": {
@@ -28,7 +31,7 @@
     "production": {
       "ios": {
         "appleId": "hamzakayc@gmail.com",
-        "ascAppId": "",
+        "ascAppId": "6760871547",
         "appleTeamId": "WZ3W8Y7U6Z"
       }
     }

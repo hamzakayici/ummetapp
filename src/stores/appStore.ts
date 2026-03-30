@@ -78,6 +78,55 @@ export const useDhikrStore = create<DhikrState>()(
   )
 );
 
+// ─── ORTAK ZİKİR (PAYLAŞILAN) ───
+export type JoinedSharedDhikr = {
+  id: string;
+  title: string;
+  shareCode: string;
+  presetName: string;
+  myContribution: number;
+  joinedAt: string;
+};
+
+type SharedDhikrState = {
+  joinedDhikrs: JoinedSharedDhikr[];
+  addJoinedDhikr: (dhikr: Omit<JoinedSharedDhikr, "myContribution" | "joinedAt">) => void;
+  incrementMyContribution: (id: string, amount: number) => void;
+  removeJoinedDhikr: (id: string) => void;
+  getContribution: (id: string) => number;
+};
+
+export const useSharedDhikrStore = create<SharedDhikrState>()(
+  persist(
+    (set, get) => ({
+      joinedDhikrs: [],
+      addJoinedDhikr: (dhikr) =>
+        set((state) => {
+          // Zaten katıldıysa tekrar ekleme
+          if (state.joinedDhikrs.some((d) => d.id === dhikr.id)) return state;
+          return {
+            joinedDhikrs: [
+              { ...dhikr, myContribution: 0, joinedAt: new Date().toISOString() },
+              ...state.joinedDhikrs,
+            ],
+          };
+        }),
+      incrementMyContribution: (id, amount) =>
+        set((state) => ({
+          joinedDhikrs: state.joinedDhikrs.map((d) =>
+            d.id === id ? { ...d, myContribution: d.myContribution + amount } : d
+          ),
+        })),
+      removeJoinedDhikr: (id) =>
+        set((state) => ({
+          joinedDhikrs: state.joinedDhikrs.filter((d) => d.id !== id),
+        })),
+      getContribution: (id) => get().joinedDhikrs.find((d) => d.id === id)?.myContribution || 0,
+    }),
+    { name: "ummet-shared-dhikr", storage: createJSONStorage(() => AsyncStorage) }
+  )
+);
+
 // ─── HAFTALIK TAKİP ───
 type WeeklyState = {
   trackedDays: Record<string, boolean>; // "2026-02-24": true

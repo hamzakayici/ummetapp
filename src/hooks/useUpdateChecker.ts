@@ -3,7 +3,7 @@ import { Alert, Platform, Linking, AppState } from "react-native";
 import * as Updates from "expo-updates";
 import * as Application from "expo-application";
 
-const APP_STORE_ID = ""; // App Store'a yüklendikten sonra ID girilecek
+const APP_STORE_ID = "6760871547";
 const STORE_URL = Platform.select({
   ios: `https://apps.apple.com/app/id${APP_STORE_ID}`,
   android: `https://play.google.com/store/apps/details?id=com.ummet.app`,

@@ -75,14 +75,14 @@ function MenuItemComponent({ item, index, sectionIndex }: { item: MenuItem; inde
 
     if (item.route === "rate") {
       const storeUrl = Platform.OS === "ios"
-        ? "https://apps.apple.com/app/id000000000"
+        ? "https://apps.apple.com/app/id6760871547"
         : "https://play.google.com/store/apps/details?id=com.ummet.app";
       Linking.openURL(storeUrl);
       return;
     }
     if (item.route === "share") {
       Share.share({
-        message: "Ümmet - İslami yaşam uygulaması. Namaz vakitleri, Kuran, dua ve daha fazlası! İndir: https://apps.apple.com/app/id000000000",
+        message: "Ümmet - İslami yaşam uygulaması. Namaz vakitleri, Kuran, dua ve daha fazlası! İndir: https://apps.apple.com/app/id6760871547",
       });
       return;
     }

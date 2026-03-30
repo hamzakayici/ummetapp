@@ -1,20 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Bu klasör (`landing`) Next.js + **Payload CMS (Admin Panel)** içerir.
 
 ## Getting Started
 
-First, run the development server:
+### Ortam değişkenleri
+
+Önce `.env` dosyasını oluştur:
+
+```bash
+cp .env.example .env
+```
+
+Gerekli değişkenler:
+
+- `PAYLOAD_SECRET`: Payload için secret (production’da mutlaka güçlü bir değer ver).
+- `DATABASE_URI`: Postgres connection string. (Supabase/Neon vb. kullanıyorsan panelden aldığın connection string’i aynen koy.)
+
+### Development server
+
+Sonra dev server’ı çalıştır:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcıda:
+
+- Site: `http://localhost:3000`
+- Payload Admin: `http://localhost:3000/admin`
+- Payload REST API: `http://localhost:3000/api`
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

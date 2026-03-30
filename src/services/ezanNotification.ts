@@ -213,8 +213,8 @@ export async function scheduleAllNotifications(
   // Önce tüm eski bildirimleri temizle
   await cancelAllNotifications();
 
-  // 1. Günlük ayet — her zaman (07:00)
-  await scheduleDailyVerseNotification();
+  // 1. Günlük ayet — artık push notification ile gönderiliyor (Edge Function)
+  // scheduleDailyVerseNotification() kaldırıldı — çift bildirim olmasın
 
   // 2. Namaz vakitleri kilit ekranı — her zaman (05:00)
   await schedulePrayerTimesLockscreen(prayers);

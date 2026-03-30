@@ -15,7 +15,7 @@ export default function Navbar() {
           <li><Link href="/hakkimizda">Hakkımızda</Link></li>
           <li><Link href="/blog">Blog</Link></li>
         </ul>
-        <Link href="/#download" className="nav-cta">İndir — Ücretsiz</Link>
+        <a href="https://apps.apple.com/tr/app/ummet/id6760871547" target="_blank" rel="noopener noreferrer" className="nav-cta">İndir — Ücretsiz</a>
       </div>
     </nav>
   );

@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator } from "react-native";
 import * as Notifications from "expo-notifications";
 import { playEzan, stopEzan } from "../src/services/audioService";
+import { registerPushToken } from "../src/services/pushTokenService";
 import {
   useFonts,
   Amiri_400Regular,
@@ -56,6 +57,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
+      // Push token'ı Supabase'e kaydet (arka planda)
+      registerPushToken();
     }
   }, [fontsLoaded, fontError]);
 

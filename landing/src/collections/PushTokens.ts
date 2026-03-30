@@ -1,0 +1,32 @@
+import type { CollectionConfig } from 'payload';
+
+export const PushTokens: CollectionConfig = {
+  slug: 'push_tokens',
+  labels: {
+    singular: 'Push Token',
+    plural: 'Push Tokenları',
+  },
+  admin: {
+    useAsTitle: 'expo_push_token',
+  },
+  fields: [
+    {
+      name: 'expo_push_token',
+      type: 'text',
+      label: 'Expo Push Token',
+      required: true,
+      unique: true,
+    },
+    {
+      name: 'platform',
+      type: 'select',
+      label: 'Platform',
+      options: [
+        { label: 'iOS', value: 'ios' },
+        { label: 'Android', value: 'android' },
+        { label: 'Web', value: 'web' },
+      ],
+      defaultValue: 'ios',
+    },
+  ],
+};
