@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { tr } from '@payloadcms/translations/languages/tr';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -38,6 +39,10 @@ if (!databaseURI) {
 }
 
 export default buildConfig({
+  i18n: {
+    supportedLanguages: { tr },
+    fallbackLanguage: 'tr',
+  },
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
   admin: {
     user: Users.slug,
