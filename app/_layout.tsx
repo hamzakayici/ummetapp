@@ -31,7 +31,7 @@ import {
   NotoNaskhArabic_700Bold,
 } from "@expo-google-fonts/noto-naskh-arabic";
 import * as SplashScreen from "expo-splash-screen";
-import { usePathname } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { analyticsStartSession, analyticsTrack } from "../src/services/analytics";
 import { refreshAnnouncements, refreshRemoteConfig } from "../src/services/remoteConfig";
 import { useForcedUpdate } from "../src/hooks/useForcedUpdate";
@@ -104,8 +104,20 @@ export default function RootLayout() {
           props: {
             campaign_id: String(data.campaign_id),
             ab: data?.ab ? String(data.ab) : undefined,
+            route: data?.route ? String(data.route) : undefined,
+            pathname: data?.pathname ? String(data.pathname) : undefined,
           },
         });
+      }
+
+      // Push ile yönlendirme (admin tarafında data içine route/pathname eklenebilir)
+      const target = data?.route || data?.pathname;
+      if (typeof target === "string" && target.trim()) {
+        try {
+          router.push(target.trim() as any);
+        } catch {
+          // ignore
+        }
       }
     });
 
