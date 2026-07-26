@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ummet",
     "slug": "ummet",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ummet.app",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "splash": {
         "tabletImage": "./assets/splash-icon-ipad.png"
       },
@@ -35,15 +35,13 @@
         "backgroundColor": "#1B5E3A"
       },
       "package": "com.ummet.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "VIBRATE",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.RECORD_AUDIO",
+        "android.permission.VIBRATE",
+        "android.permission.POST_NOTIFICATIONS",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
@@ -66,7 +64,13 @@
       "router": {},
       "eas": {
         "projectId": "6760871547"
-      }
+      },
+      "apiBaseUrl": "https://ummetapp.com/api/v1",
+      "revenueCat": {
+        "iosApiKey": "",
+        "androidApiKey": ""
+      },
+      "sentryDsn": ""
     }
   }
 }
