@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getTodayKey, getWeekKeys, readDayCount } from "../utils/dateKey";
 
 // ─── KAZA NAMAZ ───
 type PrayerType = "sabah" | "ogle" | "ikindi" | "aksam" | "yatsi" | "vitir";
@@ -61,8 +62,6 @@ type DhikrState = {
   getTodayCount: () => number;
 };
 
-const getTodayKey = () => new Date().toISOString().split("T")[0];
-
 export const useDhikrStore = create<DhikrState>()(
   persist(
     (set, get) => ({
@@ -72,7 +71,8 @@ export const useDhikrStore = create<DhikrState>()(
           const key = getTodayKey();
           return { dailyCounts: { ...state.dailyCounts, [key]: (state.dailyCounts[key] || 0) + amount } };
         }),
-      getTodayCount: () => get().dailyCounts[getTodayKey()] || 0,
+      // readDayCount eski UTC anahtarlarını da kontrol eder — geçmiş veri kaybolmasın
+      getTodayCount: () => readDayCount(get().dailyCounts, new Date()),
     }),
     { name: "ummet-dhikr", storage: createJSONStorage(() => AsyncStorage) }
   )
@@ -148,19 +148,8 @@ export const useWeeklyStore = create<WeeklyState>()(
           return { trackedDays: newDays };
         }),
       getWeekData: () => {
-        const state = get();
-        const result: boolean[] = [];
-        const now = new Date();
-        const dayOfWeek = now.getDay();
-        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
-        for (let i = 0; i < 7; i++) {
-          const day = new Date(now);
-          day.setDate(now.getDate() + mondayOffset + i);
-          const key = day.toISOString().split("T")[0];
-          result.push(!!state.trackedDays[key]);
-        }
-        return result;
+        const { trackedDays } = get();
+        return getWeekKeys().map((key) => !!trackedDays[key]);
       },
     }),
     { name: "ummet-weekly", storage: createJSONStorage(() => AsyncStorage) }
@@ -192,10 +181,11 @@ export const useSettingsStore = create<SettingsState>()(
 );
 
 // ─── ÜMMET PRO ───
+// isPro yalnızca RevenueCat entitlement'ından gelir — lokal toggle yok.
 type ProState = {
   isPro: boolean;
   activatedAt: string | null;
-  togglePro: () => void;
+  setFromCustomerInfo: (isPro: boolean, activatedAt: string | null) => void;
 };
 
 export const useProStore = create<ProState>()(
@@ -203,11 +193,7 @@ export const useProStore = create<ProState>()(
     (set) => ({
       isPro: false,
       activatedAt: null,
-      togglePro: () =>
-        set((state) => ({
-          isPro: !state.isPro,
-          activatedAt: !state.isPro ? new Date().toISOString() : null,
-        })),
+      setFromCustomerInfo: (isPro, activatedAt) => set({ isPro, activatedAt }),
     }),
     { name: "ummet-pro", storage: createJSONStorage(() => AsyncStorage) }
   )
@@ -232,7 +218,7 @@ type QuranSettingsState = {
 };
 
 export const QURAN_THEMES: Record<QuranTheme, { bg: string; text: string; accent: string; secondary: string; name: string }> = {
-  dark: { bg: "#0A0E17", text: "#ECDFCC", accent: "#D4AF37", secondary: "#5A6B78", name: "Koyu" },
+  dark: { bg: "#0A0E17", text: "#ECDFCC", accent: "#D4AF37", secondary: "#8A9BA8", name: "Koyu" },
   light: { bg: "#FFFFFF", text: "#1A1A2E", accent: "#1B6B4A", secondary: "#666666", name: "Açık" },
   sepia: { bg: "#F4ECD8", text: "#5B4636", accent: "#8B6914", secondary: "#8B7355", name: "Sepia" },
   cream: { bg: "#FFF8E7", text: "#3D2B1F", accent: "#B8860B", secondary: "#7D6B5D", name: "Krem" },

@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { analyticsTrack } from "../src/services/analytics";
-import { getAnnouncementsCached, refreshAnnouncements, type Announcement } from "../src/services/remoteConfig";
+import { getAnnouncementsCached, refreshAnnouncements, trackAnnouncementOpened, type Announcement } from "../src/services/remoteConfig";
 
 const READ_KEY = "ummet:announcements:read_v1";
 
@@ -112,6 +112,8 @@ export default function AnnouncementsScreen() {
                       const next = await loadReadSet();
                       setReadSet(next);
                       void analyticsTrack({ name: "announcement_open", props: { id: a.id, type: a.type ?? "info" } });
+                      // Panelde açılma oranı metriği — sunucu cihaz başına günde bir sayıyor
+                      void trackAnnouncementOpened(a.id);
                     }}
                   >
                     <View
@@ -127,13 +129,13 @@ export default function AnnouncementsScreen() {
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
                           <MaterialCommunityIcons name="bullhorn-outline" size={16} color={b.color} />
                           <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: `${b.color}1A`, borderWidth: 1, borderColor: `${b.color}33` }}>
-                            <Text style={{ color: b.color, fontSize: 11, fontWeight: "800" }}>{b.text}</Text>
+                            <Text style={{ color: b.color, fontSize: 12, fontWeight: "800" }}>{b.text}</Text>
                           </View>
                           {!isRead ? (
                             <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#D4AF37", marginLeft: 4 }} />
                           ) : null}
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color="#5A6B78" />
+                        <Ionicons name="chevron-forward" size={16} color="#8A9BA8" />
                       </View>
 
                       <Text style={{ color: "#ECDFCC", fontSize: 15, fontWeight: "800", marginTop: 10 }}>

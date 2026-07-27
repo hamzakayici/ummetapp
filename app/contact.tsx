@@ -88,7 +88,7 @@ export default function ContactScreen() {
               value={name}
               onChangeText={setName}
               placeholder="Adınız"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#8A9BA8"
             />
 
             <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: "600", marginBottom: 6 }}>E-posta</Text>
@@ -97,7 +97,7 @@ export default function ContactScreen() {
               value={email}
               onChangeText={setEmail}
               placeholder="ornek@mail.com"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#8A9BA8"
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -108,7 +108,7 @@ export default function ContactScreen() {
               value={subject}
               onChangeText={setSubject}
               placeholder="Öneri / Şikayet / Soru"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#8A9BA8"
             />
 
             <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: "600", marginBottom: 6 }}>Mesajınız</Text>
@@ -117,7 +117,7 @@ export default function ContactScreen() {
               value={message}
               onChangeText={setMessage}
               placeholder="Mesajınızı buraya yazın..."
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#8A9BA8"
               multiline
             />
           </Animated.View>

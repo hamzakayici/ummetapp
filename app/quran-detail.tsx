@@ -303,8 +303,8 @@ export default function QuranDetailScreen() {
         </View>
       )}
       <View style={{ marginTop: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        <MaterialCommunityIcons name="microphone" size={10} color="#6B7280" />
-        <Text style={{ color: "#6B7280", fontSize: 10, marginLeft: 4 }}>Kari: Mishary Rashid Alafasy · Meal: Diyanet İşleri</Text>
+        <MaterialCommunityIcons name="microphone" size={10} color="#8A9BA8" />
+        <Text style={{ color: "#8A9BA8", fontSize: 12, marginLeft: 4 }}>Kari: Mishary Rashid Alafasy · Meal: Diyanet İşleri</Text>
       </View>
     </View>
   ), [id, showTranslation, fontConfig]);
@@ -349,7 +349,7 @@ export default function QuranDetailScreen() {
             <View style={{ flex: 1 }}>
               <Text style={{ color: "#FFFFFF", fontSize: 18, fontWeight: "700" }}>{nameTr || "Sure"}</Text>
               {meta && (
-                <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, marginTop: 2 }}>
+                <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 2 }}>
                   {meta.numberOfAyahs} ayet · {meta.revelationType === "Meccan" ? "Mekki" : "Medeni"}
                 </Text>
               )}

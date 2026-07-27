@@ -4,7 +4,8 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator, Text, TouchableOpacity, AppState } from "react-native";
 import * as Notifications from "expo-notifications";
-import { playEzan, stopEzan } from "../src/services/audioService";
+import { playEzan } from "../src/services/audioService";
+import { useSettingsStore } from "../src/stores/appStore";
 import { registerPushToken } from "../src/services/pushTokenService";
 import {
   useFonts,
@@ -32,9 +33,22 @@ import {
 } from "@expo-google-fonts/noto-naskh-arabic";
 import * as SplashScreen from "expo-splash-screen";
 import { router, usePathname } from "expo-router";
-import { analyticsEndSession, analyticsStartSession, analyticsTrack } from "../src/services/analytics";
+import { analyticsEndSession, analyticsStartSession, analyticsTrack, getAnalyticsDeviceId } from "../src/services/analytics";
+import { markFirstOpen } from "../src/services/reviewPrompt";
+import { setupNotificationChannels } from "../src/services/notificationChannels";
+import { applyTextScalingLimits } from "../src/utils/textScaling";
+import { initErrorTracking, setErrorUser } from "../src/services/errorTracking";
 import { refreshAnnouncements, refreshRemoteConfig } from "../src/services/remoteConfig";
+import { initPurchases } from "../src/services/purchases";
 import { useForcedUpdate } from "../src/hooks/useForcedUpdate";
+
+// Hata izleme — mümkün olan en erken an, ilk render'daki hataları da yakalasın.
+// DSN tanımlı değilse hiçbir şey yapmaz.
+initErrorTracking();
+
+// Yazı ölçeklemesine üst sınır — bileşenler render edilmeden önce çalışmalı.
+// Sınırsız ölçekleme erişilebilirlik boyutlarında düzeni patlatıyordu.
+applyTextScalingLimits();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,15 +77,24 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
-      // Push token'ı Supabase'e kaydet (arka planda)
-      registerPushToken();
+
+      // Android bildirim kanalları — bildirim ZAMANLANMADAN önce kurulmalı,
+      // yoksa kanal yokken zamanlanan bildirim varsayılan sesle gider ve
+      // makam bazlı ezan sesleri duyulmaz. iOS'ta bu çağrı bir şey yapmaz.
+      void setupNotificationChannels().then(() => {
+        registerPushToken();
+      });
+      void markFirstOpen();
       // Analytics: session + app_open
       void analyticsStartSession().then(() => {
         void analyticsTrack({ name: "app_open" });
+        // Çökme kaydını analytics'teki cihazla eşleştir
+        void getAnalyticsDeviceId().then(setErrorUser);
       });
       // Remote config + announcements (admin yönetimi)
       void refreshRemoteConfig();
       void refreshAnnouncements();
+      void initPurchases();
     }
   }, [fontsLoaded, fontError]);
 
@@ -99,7 +122,8 @@ export default function RootLayout() {
     // Foreground: bildirim gelince tam ezan çal
     const receivedSub = Notifications.addNotificationReceivedListener((notification) => {
       const data = notification.request.content.data;
-      if (data?.type === "ezan" && data?.prayerName) {
+      const ezanEnabled = useSettingsStore.getState().notificationsEnabled;
+      if (ezanEnabled && data?.type === "ezan" && data?.prayerName) {
         playEzan(data.prayerName as string);
       }
     });
@@ -107,7 +131,8 @@ export default function RootLayout() {
     // Kullanıcı bildirimi tıkladığında: tam ezan çal
     const responseSub = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
-      if (data?.type === "ezan" && data?.prayerName) {
+      const ezanEnabled = useSettingsStore.getState().notificationsEnabled;
+      if (ezanEnabled && data?.type === "ezan" && data?.prayerName) {
         playEzan(data.prayerName as string);
       }
       if (data?.campaign_id) {
@@ -170,12 +195,12 @@ export default function RootLayout() {
           </Text>
           <View style={{ marginTop: 10 }}>
             {forced.currentVersion ? (
-              <Text style={{ color: "#5A6B78", fontSize: 12 }}>
+              <Text style={{ color: "#8A9BA8", fontSize: 12 }}>
                 Mevcut sürüm: {forced.currentVersion}
               </Text>
             ) : null}
             {forced.minVersion ? (
-              <Text style={{ color: "#5A6B78", fontSize: 12, marginTop: forced.currentVersion ? 4 : 0 }}>
+              <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: forced.currentVersion ? 4 : 0 }}>
                 Minimum sürüm: {forced.minVersion}
               </Text>
             ) : null}
@@ -235,6 +260,7 @@ export default function RootLayout() {
         <Stack.Screen name="duas" />
         <Stack.Screen name="calculator" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="support" />
       </Stack>
     </>
   );

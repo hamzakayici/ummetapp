@@ -139,7 +139,7 @@ const DUAS: DuaCategory[] = [
   {
     category: "Cenaze & Ahiret",
     icon: "candelabra",
-    color: "#6B7280",
+    color: "#8A9BA8",
     items: [
       { id: 100, title: "Cenaze Duası", arabic: "اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ وَعَافِهِ وَاعْفُ عَنْهُ", tr: "Allah'ım! Onu bağışla, merhamet et, afiyet ver ve affeyle.", source: "Müslim" },
       { id: 101, title: "Kabir Ziyareti", arabic: "السَّلَامُ عَلَيْكُمْ أَهْلَ الدِّيَارِ مِنَ الْمُؤْمِنِينَ وَالْمُسْلِمِينَ", tr: "Ey bu kabirlerdeki mümin ve Müslümanlar! Size selam olsun.", source: "Müslim" },
@@ -214,17 +214,17 @@ export default function DuasScreen() {
 
         {/* Arama */}
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 12, backgroundColor: "rgba(10,24,18,0.8)", borderRadius: 12, paddingHorizontal: 12, height: 40, borderWidth: 1, borderColor: "rgba(255,255,255,0.05)" }}>
-          <Ionicons name="search" size={16} color="#6B7280" />
+          <Ionicons name="search" size={16} color="#8A9BA8" />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Dua ara..."
-            placeholderTextColor="#6B7280"
+            placeholderTextColor="#8A9BA8"
             style={{ flex: 1, color: "#FFFFFF", fontSize: 14, marginLeft: 8 }}
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch("")}>
-              <Ionicons name="close-circle" size={18} color="#6B7280" />
+              <Ionicons name="close-circle" size={18} color="#8A9BA8" />
             </TouchableOpacity>
           )}
         </View>
@@ -248,8 +248,8 @@ export default function DuasScreen() {
                   </Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={{ color: "#6B7280", fontSize: 12, marginRight: 6 }}>{category.items.length}</Text>
-                  <Ionicons name={expandedCategory === category.category ? "chevron-up" : "chevron-down"} size={16} color="#6B7280" />
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, marginRight: 6 }}>{category.items.length}</Text>
+                  <Ionicons name={expandedCategory === category.category ? "chevron-up" : "chevron-down"} size={16} color="#8A9BA8" />
                 </View>
               </View>
             </TouchableOpacity>
@@ -268,9 +268,9 @@ export default function DuasScreen() {
                     </View>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                       <TouchableOpacity onPress={() => toggleFav(dua.id)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                        <Ionicons name={favIds.includes(dua.id) ? "heart" : "heart-outline"} size={16} color={favIds.includes(dua.id) ? "#E53935" : "#6B7280"} />
+                        <Ionicons name={favIds.includes(dua.id) ? "heart" : "heart-outline"} size={16} color={favIds.includes(dua.id) ? "#E53935" : "#8A9BA8"} />
                       </TouchableOpacity>
-                      <Ionicons name={expandedDua === dua.id ? "chevron-up" : "chevron-down"} size={14} color="#6B7280" />
+                      <Ionicons name={expandedDua === dua.id ? "chevron-up" : "chevron-down"} size={14} color="#8A9BA8" />
                     </View>
                   </View>
 
@@ -282,7 +282,7 @@ export default function DuasScreen() {
                       <View style={{ height: 1, backgroundColor: "rgba(27,67,50,0.15)", marginVertical: 10 }} />
                       <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14, lineHeight: 22 }}>{dua.tr}</Text>
                       {dua.source && (
-                        <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 8, fontWeight: "600" }}>{dua.source}</Text>
+                        <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 8, fontWeight: "600" }}>{dua.source}</Text>
                       )}
                     </View>
                   )}
@@ -294,8 +294,8 @@ export default function DuasScreen() {
 
         {filteredCategories.length === 0 && (
           <View style={{ alignItems: "center", paddingTop: 60 }}>
-            <MaterialCommunityIcons name="book-search" size={48} color="#6B7280" />
-            <Text style={{ color: "#6B7280", fontSize: 15, marginTop: 12 }}>
+            <MaterialCommunityIcons name="book-search" size={48} color="#8A9BA8" />
+            <Text style={{ color: "#8A9BA8", fontSize: 15, marginTop: 12 }}>
               {showFavsOnly ? "Henüz favori dua eklenmemiş" : "Dua bulunamadı"}
             </Text>
           </View>

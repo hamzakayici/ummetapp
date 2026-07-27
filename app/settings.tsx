@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Switch, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Switch } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSettingsStore } from "../src/stores/appStore";
+import { syncPrayerNotifications } from "../src/services/ezanNotification";
+import { stopEzan } from "../src/services/audioService";
 
 const CALC_METHODS = [
   { id: 13, name: "Diyanet İşleri Başkanlığı" },
@@ -23,7 +25,7 @@ const REMINDER_OPTIONS = [
 
 function SectionTitle({ title }: { title: string }) {
   return (
-    <Text style={{ color: "rgba(212,175,55,0.5)", fontSize: 11, fontWeight: "700", marginTop: 24, marginBottom: 10, marginLeft: 4, textTransform: "uppercase", letterSpacing: 1.5 }}>
+    <Text style={{ color: "rgba(212,175,55,0.5)", fontSize: 12, fontWeight: "700", marginTop: 24, marginBottom: 10, marginLeft: 4, textTransform: "uppercase", letterSpacing: 1.5 }}>
       {title}
     </Text>
   );
@@ -68,6 +70,14 @@ export default function SettingsScreen() {
     setPrayerNotifs((prev) => ({ ...prev, [key]: !(prev as any)[key] }));
   };
 
+  const handleNotificationsToggle = async () => {
+    if (notificationsEnabled) {
+      await stopEzan();
+    }
+    toggleNotifications();
+    await syncPrayerNotifications();
+  };
+
   const PRAYER_NOTIF_LIST = [
     { key: "Fajr", label: "İmsak", icon: "weather-sunset-up" },
     { key: "Sunrise", label: "Güneş", icon: "white-balance-sunny" },
@@ -103,7 +113,7 @@ export default function SettingsScreen() {
         <SectionTitle title="Bildirimler" />
 
         <SettingsRow icon="bell-outline" iconColor="#F97316" title="Namaz Vakti Bildirimleri" subtitle="Ezan vakitlerinde hatırlatma"
-          right={<Switch value={notificationsEnabled} onValueChange={toggleNotifications} trackColor={{ false: "#3A3F47", true: "#2D6A4F" }} thumbColor={notificationsEnabled ? "#D4AF37" : "#f4f3f4"} />} />
+          right={<Switch value={notificationsEnabled} onValueChange={() => { void handleNotificationsToggle(); }} trackColor={{ false: "#3A3F47", true: "#2D6A4F" }} thumbColor={notificationsEnabled ? "#D4AF37" : "#f4f3f4"} />} />
 
         {notificationsEnabled && (
           <>
@@ -179,12 +189,12 @@ export default function SettingsScreen() {
         {/* ═══ HAKKINDA ═══ */}
         <SectionTitle title="Hakkında" />
 
-        <SettingsRow icon="information-outline" iconColor="#5A6B78" title="Versiyon" subtitle="1.0.0"
+        <SettingsRow icon="information-outline" iconColor="#8A9BA8" title="Versiyon" subtitle="1.0.0"
           right={<Text style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}>Ümmet</Text>} />
 
         <View style={{ alignItems: "center", marginTop: 30 }}>
           <MaterialCommunityIcons name="star-crescent" size={20} color="rgba(255,255,255,0.15)" />
-          <Text style={{ color: "rgba(255,255,255,0.15)", fontSize: 10, marginTop: 6 }}>Ümmet v1.0.0 · Bismillah</Text>
+          <Text style={{ color: "rgba(255,255,255,0.15)", fontSize: 12, marginTop: 6 }}>Ümmet v1.0.0 · Bismillah</Text>
         </View>
       </ScrollView>
     </View>

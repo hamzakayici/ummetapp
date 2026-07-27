@@ -101,13 +101,13 @@ export default function BadgesScreen() {
                     {unlocked ? (
                       <MaterialCommunityIcons name={badge.icon as any} size={26} color={badge.color} />
                     ) : (
-                      <Ionicons name="lock-closed" size={20} color="#6B7280" />
+                      <Ionicons name="lock-closed" size={20} color="#8A9BA8" />
                     )}
                   </View>
-                  <Text style={{ color: unlocked ? "#FFFFFF" : "#6B7280", fontSize: 14, fontWeight: "700", marginTop: 10, textAlign: "center" }}>
+                  <Text style={{ color: unlocked ? "#FFFFFF" : "#8A9BA8", fontSize: 14, fontWeight: "700", marginTop: 10, textAlign: "center" }}>
                     {badge.name}
                   </Text>
-                  <Text style={{ color: "#6B7280", fontSize: 11, marginTop: 4, textAlign: "center" }}>{badge.desc}</Text>
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 4, textAlign: "center" }}>{badge.desc}</Text>
                 </View>
               </Animated.View>
             );

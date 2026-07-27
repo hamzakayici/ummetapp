@@ -121,7 +121,7 @@ const SurahItem = memo(function SurahItem({
           <Ionicons
             name={isFav ? "heart" : "heart-outline"}
             size={22}
-            color={isFav ? "#E74C3C" : "#5A6B78"}
+            color={isFav ? "#E74C3C" : "#8A9BA8"}
           />
         </TouchableOpacity>
 
@@ -220,7 +220,7 @@ const JuzItem = memo(function JuzItem({
                   gap: 6,
                 }}
               >
-                <Text style={{ color: "#D4AF37", fontSize: 11, fontWeight: "700" }}>{s.id}</Text>
+                <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "700" }}>{s.id}</Text>
                 <Text style={{ color: "#ECDFCC", fontSize: 13, fontWeight: "500" }}>{s.nameTr}</Text>
               </View>
             </TouchableOpacity>
@@ -358,7 +358,7 @@ export default function QuranScreen() {
                     paddingVertical: 1,
                   }}
                 >
-                  <Text style={{ color: "#FFF", fontSize: 10, fontWeight: "700" }}>
+                  <Text style={{ color: "#FFF", fontSize: 12, fontWeight: "700" }}>
                     {favorites.size}
                   </Text>
                 </View>
@@ -406,7 +406,7 @@ export default function QuranScreen() {
               <Text style={{ color: "#8A9BA8", fontSize: 17, fontWeight: "600", marginTop: 16, textAlign: "center" }}>
                 Henüz favori sure eklemediniz
               </Text>
-              <Text style={{ color: "#5A6B78", fontSize: 14, marginTop: 8, textAlign: "center", lineHeight: 22 }}>
+              <Text style={{ color: "#8A9BA8", fontSize: 14, marginTop: 8, textAlign: "center", lineHeight: 22 }}>
                 Sureler sekmesinde kalp ikonuna basarak favori ekleyebilirsiniz
               </Text>
             </View>

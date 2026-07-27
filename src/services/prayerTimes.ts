@@ -1,5 +1,6 @@
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { captureError } from "./errorTracking";
 
 export type PrayerTimesData = {
   Fajr: string;
@@ -154,7 +155,9 @@ export async function fetchPrayerTimes(
     await cachePrayerTimes(prayers, dateKey);
 
     return prayers;
-  } catch {
+  } catch (e) {
+    // API'ye ulaşılamadı — bilmemiz gerek, vakitler uygulamanın çekirdeği
+    captureError("prayerTimes:fetch", e);
     // İnternet yoksa cache'den dön (dünkü bile olsa yaklaşık doğru)
     if (cached) {
       return cached.prayers;
@@ -202,7 +205,9 @@ export async function fetchPrayerTimesForDate(
       time: timings[prayer.key].replace(/\s*\(.*\)/, ""),
       iconName: prayer.iconName,
     }));
-  } catch {
+  } catch (e) {
+    // Boş dizi dönmek ekranı sessizce boşaltıyor — sebebi bilinmeli
+    captureError("prayerTimes:parse", e);
     return [];
   }
 }

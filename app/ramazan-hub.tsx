@@ -20,6 +20,7 @@ import {
   type PrayerTimeEntry,
 } from "../src/services/prayerTimes";
 import { toHijri } from "../src/utils/hijriCalendar";
+import { getTodayKey } from "../src/utils/dateKey";
 
 const { width } = Dimensions.get("window");
 const STORAGE_KEY = "@ummet_ramazan_fasting";
@@ -125,7 +126,7 @@ export default function RamazanHubScreen() {
   }, [prayerTimes, now]);
 
   // Bugün oruç tutuldu mu
-  const todayKey = now.toISOString().split("T")[0];
+  const todayKey = getTodayKey();
   const todayFasted = fastingDays[todayKey] || false;
   const totalFasted = Object.values(fastingDays).filter(Boolean).length;
 
@@ -297,7 +298,7 @@ export default function RamazanHubScreen() {
                   }}
                 />
               </View>
-              <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 4, textAlign: "right" }}>
+              <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 4, textAlign: "right" }}>
                 %{Math.round((totalFasted / 30) * 100)} tamamlandı
               </Text>
             </View>
@@ -375,7 +376,7 @@ export default function RamazanHubScreen() {
             </View>
           ) : (
             <View style={{ marginHorizontal: 16, padding: 20, borderRadius: 14, backgroundColor: "rgba(10,24,18,0.7)", alignItems: "center" }}>
-              <Text style={{ color: "#6B7280", fontSize: 14 }}>Vakitler yükleniyor...</Text>
+              <Text style={{ color: "#8A9BA8", fontSize: 14 }}>Vakitler yükleniyor...</Text>
             </View>
           )}
         </Animated.View>

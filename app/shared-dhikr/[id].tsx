@@ -7,8 +7,8 @@ import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import Animated, { FadeInDown, FadeInUp, useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, withRepeat } from "react-native-reanimated";
 import ConfettiCannon from "react-native-confetti-cannon";
 
-import { supabase } from "../../src/services/supabase";
-import { getSharedDhikrById, incrementSharedDhikr, SharedDhikr } from "../../src/services/sharedDhikr";
+import { getSharedDhikrById, incrementSharedDhikr, pollSharedDhikr, SharedDhikr } from "../../src/services/sharedDhikr";
+import { maybeAskForReview } from "../../src/services/reviewPrompt";
 import { useSharedDhikrStore } from "../../src/stores/appStore";
 
 const { width } = Dimensions.get("window");
@@ -72,37 +72,28 @@ export default function LiveSharedDhikrScreen() {
 
     fetchDhikr();
 
-    // 2. Canlı veritabanı dinlemesi (Realtime)
-    const channel = supabase
-      .channel(`shared_dhikr_${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "shared_dhikrs",
-          filter: `id=eq.${id}`,
-        },
-        (payload) => {
-          if (isMounted && payload.new) {
-            setDhikrData((prev) => {
-              // Eğer hedefe yeni ulaştıysa konfeti
-              if (prev && payload.new.current_count >= payload.new.target_count && prev.current_count < prev.target_count) {
-                setShowConfetti(true);
-              }
-              return payload.new as SharedDhikr;
-            });
-          }
+    // 2. Canlı takip — Realtime yerine polling.
+    // Paylaşımlı hostingde kalıcı WebSocket süreci tutulamıyor; ekran açıkken
+    // 4 saniyede bir sunucudan okuyoruz.
+    const stopPolling = pollSharedDhikr(id, (fresh) => {
+      if (!isMounted) return;
+      setDhikrData((prev) => {
+        // Hedefe yeni ulaşıldıysa konfeti
+        if (prev && fresh.current_count >= fresh.target_count && prev.current_count < prev.target_count) {
+          setShowConfetti(true);
+          // Hedefe birlikte ulaşmak güçlü bir memnuniyet anı
+          setTimeout(() => void maybeAskForReview("hatim_completed"), 4000);
         }
-      )
-      .subscribe();
+        return fresh;
+      });
+    });
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
-      // Çıkarken senkronlanmamış kalan zikirleri son kez at:
+      stopPolling();
+      // Çıkarken senkronlanmamış kalan zikirleri son kez gönder
       if (unsyncedCount.current > 0) {
-        incrementSharedDhikr(id, unsyncedCount.current);
+        void incrementSharedDhikr(id, unsyncedCount.current);
       }
     };
   }, [id]);
@@ -194,7 +185,7 @@ export default function LiveSharedDhikrScreen() {
            <TouchableOpacity onPress={onShare} activeOpacity={0.8}>
              <View style={{ marginTop: 16, backgroundColor: "rgba(64,192,87,0.15)", borderRadius: 12, padding: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderWidth: 1, borderColor: "rgba(64,192,87,0.3)" }}>
                <View>
-                 <Text style={{ color: "#8A9BA8", fontSize: 11, fontWeight: "600" }}>Davet Kodu</Text>
+                 <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600" }}>Davet Kodu</Text>
                  <Text style={{ color: "#ECDFCC", fontSize: 22, fontWeight: "800", letterSpacing: 2 }}>{dhikrData.share_code}</Text>
                </View>
                <View style={{ backgroundColor: "#40C057", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, flexDirection: "row", alignItems: "center" }}>
@@ -210,7 +201,7 @@ export default function LiveSharedDhikrScreen() {
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           
           <Animated.View entering={FadeInDown.delay(200).springify()} style={{ alignItems: "center", marginBottom: 30 }}>
-             <Text style={{ color: "#5A6B78", fontSize: 13, fontWeight: "600" }}>Senin Doğrudan Katkın</Text>
+             <Text style={{ color: "#8A9BA8", fontSize: 13, fontWeight: "600" }}>Senin Doğrudan Katkın</Text>
              <Text style={{ color: "#40C057", fontSize: 24, fontWeight: "800" }}>{myTotalContribution}</Text>
           </Animated.View>
 
@@ -247,7 +238,7 @@ export default function LiveSharedDhikrScreen() {
                     <Text style={{ color: isComplete ? "#D4AF37" : "#ECDFCC", fontSize: 50, fontWeight: "800", lineHeight: 60 }} adjustsFontSizeToFit numberOfLines={1}>
                         {dhikrData.current_count.toLocaleString("tr-TR")}
                     </Text>
-                    <Text style={{ color: "#5A6B78", fontSize: 14, fontWeight: "500" }}>/ {dhikrData.target_count.toLocaleString("tr-TR")}</Text>
+                    <Text style={{ color: "#8A9BA8", fontSize: 14, fontWeight: "500" }}>/ {dhikrData.target_count.toLocaleString("tr-TR")}</Text>
                     {isComplete && (
                       <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
                         <Ionicons name="checkmark-circle" size={16} color="#D4AF37" />
@@ -267,7 +258,7 @@ export default function LiveSharedDhikrScreen() {
              </View>
              
              <View style={{ flexDirection: "row", width: width - 80, justifyContent: "space-between", marginTop: 8 }}>
-                <Text style={{ color: "#5A6B78", fontSize: 12, fontWeight: "600" }}>Kalan: {Math.max(dhikrData.target_count - dhikrData.current_count, 0).toLocaleString("tr-TR")}</Text>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600" }}>Kalan: {Math.max(dhikrData.target_count - dhikrData.current_count, 0).toLocaleString("tr-TR")}</Text>
                 <Text style={{ color: "#40C057", fontSize: 12, fontWeight: "600" }}>%{progress.toFixed(1)}</Text>
              </View>
           </Animated.View>

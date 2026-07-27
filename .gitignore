@@ -31,6 +31,7 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
@@ -40,3 +41,9 @@ yarn-error.*
 /ios
 /android
 screenshots/
+
+# App Store Connect analytics çıktıları
+data/appstore/
+
+# Claude Code yerel ayarları (izin listesi vb.)
+.claude/

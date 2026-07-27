@@ -1,4 +1,5 @@
 import { Audio } from "expo-av";
+import { captureError } from "./errorTracking";
 
 // Her vakit için local ezan ses dosyaları (bundle'dan)
 const EZAN_SOUNDS: Record<string, any> = {
@@ -64,7 +65,10 @@ export async function playEzan(prayerKey?: string): Promise<void> {
         currentSound = null;
       }
     });
-  } catch {
+  } catch (e) {
+    // Ezan çalmazsa kullanıcı fark eder ama şikayet etmeyebilir —
+    // bizim haberimiz olmalı, çekirdek özellik
+    captureError("audio:playEzan", e);
     isPlaying = false;
   } finally {
     ezanLock = false;

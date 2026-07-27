@@ -1,12 +1,13 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
-import { supabase } from "./supabase";
+import { api } from "./api";
 import * as Application from "expo-application";
 import { getAnalyticsDeviceId } from "./analytics";
+import { captureError } from "./errorTracking";
 
 /**
- * Expo Push Token al ve Supabase'e kaydet.
+ * Expo Push Token al ve sunucuya kaydet.
  * Uygulama her açılışta çağrılır — token değiştiyse günceller (upsert).
  */
 export async function registerPushToken(): Promise<string | null> {
@@ -37,22 +38,17 @@ export async function registerPushToken(): Promise<string | null> {
     const deviceId = await getAnalyticsDeviceId();
     const appVersion = Application.nativeApplicationVersion ?? null;
 
-    // 3. Supabase'e kaydet (upsert — aynı token varsa updated_at güncellenir)
-    await supabase
-      .from("push_tokens")
-      .upsert(
-        {
-          expo_push_token: expoPushToken,
-          platform: Platform.OS,
-          device_id: deviceId,
-          app_version: appVersion,
-          last_seen_at: new Date().toISOString(),
-        },
-        { onConflict: "expo_push_token" }
-      );
+    // 3. Sunucuya kaydet — aynı token varsa güncellenir
+    await api.post("/push-tokens", {
+      expo_push_token: expoPushToken,
+      platform: Platform.OS,
+      device_id: deviceId,
+      app_version: appVersion,
+    });
 
     return expoPushToken;
-  } catch {
+  } catch (e) {
+    captureError("pushToken:register", e);
     return null;
   }
 }

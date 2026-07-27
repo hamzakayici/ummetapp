@@ -234,7 +234,7 @@ export default function QiblaScreen() {
 
       {/* Alt not */}
       <View style={[styles.bottomNote, { paddingBottom: insets.bottom + 12 }]}>
-        <MaterialCommunityIcons name="information-outline" size={14} color="#6B7280" />
+        <MaterialCommunityIcons name="information-outline" size={14} color="#8A9BA8" />
         <Text style={styles.noteText}>
           Telefonu yere paralel tutun ve metal nesnelerden uzak durun
         </Text>
@@ -367,8 +367,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.03)",
   },
   infoLabel: {
-    color: "#6B7280",
-    fontSize: 10,
+    color: "#8A9BA8",
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1,
     marginBottom: 4,
@@ -379,8 +379,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   infoSub: {
-    color: "#6B7280",
-    fontSize: 11,
+    color: "#8A9BA8",
+    fontSize: 12,
     fontWeight: "500",
     marginTop: 2,
   },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   noteText: {
-    color: "#6B7280",
+    color: "#8A9BA8",
     fontSize: 12,
     fontWeight: "500",
   },

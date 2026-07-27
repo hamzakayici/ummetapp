@@ -6,6 +6,7 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useKazaStore, useWeeklyStore } from "../src/stores/appStore";
+import { toDateKey } from "../src/utils/dateKey";
 
 export default function AnalyticsScreen() {
   const insets = useSafeAreaInsets();
@@ -19,7 +20,7 @@ export default function AnalyticsScreen() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().split("T")[0];
+      const key = toDateKey(d);
       const dayNames = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
       days.push({ key, label: dayNames[d.getDay()], done: weeklyStore.trackedDays?.[key] || false });
     }
@@ -71,12 +72,12 @@ export default function AnalyticsScreen() {
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               {weekDays.map((day) => (
                 <View key={day.key} style={{ alignItems: "center" }}>
-                  <Text style={{ color: "#6B7280", fontSize: 11, fontWeight: "600", marginBottom: 6 }}>{day.label}</Text>
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600", marginBottom: 6 }}>{day.label}</Text>
                   <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: day.done ? "rgba(16,185,129,0.15)" : "rgba(10,24,18,0.7)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: day.done ? "#10B981" : "rgba(27,67,50,0.1)" }}>
                     {day.done ? (
                       <Ionicons name="checkmark" size={18} color="#10B981" />
                     ) : (
-                      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#6B7280" }} />
+                      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#8A9BA8" }} />
                     )}
                   </View>
                 </View>
@@ -85,7 +86,7 @@ export default function AnalyticsScreen() {
             <View style={{ marginTop: 12, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.08)" }}>
               <View style={{ height: 6, borderRadius: 3, backgroundColor: "#10B981", width: `${(weeklyCompleted / 7) * 100}%` }} />
             </View>
-            <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 6, textAlign: "right" }}>%{Math.round((weeklyCompleted / 7) * 100)}</Text>
+            <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 6, textAlign: "right" }}>%{Math.round((weeklyCompleted / 7) * 100)}</Text>
           </View>
         </Animated.View>
 
@@ -97,7 +98,7 @@ export default function AnalyticsScreen() {
                 <MaterialCommunityIcons name={stat.icon} size={24} color={stat.color} />
                 <Text style={{ color: "#FFFFFF", fontSize: 28, fontWeight: "800", marginTop: 8 }}>{stat.value}</Text>
                 <Text style={{ color: stat.color, fontSize: 13, fontWeight: "600", marginTop: 2 }}>{stat.label}</Text>
-                <Text style={{ color: "#6B7280", fontSize: 11, marginTop: 2 }}>{stat.sublabel}</Text>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 2 }}>{stat.sublabel}</Text>
               </View>
             </Animated.View>
           ))}

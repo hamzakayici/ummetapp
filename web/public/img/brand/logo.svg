@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" role="img" aria-label="ùmmet">
+  <defs>
+    <linearGradient id="ummet-gold" x1="18%" y1="12%" x2="82%" y2="88%">
+      <stop offset="0%" stop-color="#F5E6A8"/>
+      <stop offset="38%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#9A7B1E"/>
+    </linearGradient>
+    <radialGradient id="ummet-bg" cx="42%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#2D6A4F"/>
+      <stop offset="100%" stop-color="#142820"/>
+    </radialGradient>
+    <pattern id="ummet-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M10 0 20 10 10 20 0 10Z" fill="none" stroke="#3d7a5c" stroke-width="0.55" opacity="0.22"/>
+      <path d="M0 0 10 10M10 10 20 20M20 0 10 10M10 10 0 20" stroke="#3d7a5c" stroke-width="0.35" opacity="0.14"/>
+    </pattern>
+  </defs>
+  <g transform="translate(0 0) scale(0.48)">
+    <rect width="100" height="100" rx="22" fill="url(#ummet-bg)"/>
+    <rect width="100" height="100" rx="22" fill="url(#ummet-pattern)"/>
+    <path fill="url(#ummet-gold)" fill-rule="evenodd" d="M48 18a32 32 0 1 1 0 64 32 32 0 1 1 0-64Zm8 0a26 26 0 1 0 0 52 26 26 0 1 0 0-52Z"/>
+    <path fill="url(#ummet-gold)" d="M34 44.5 35.6 48.8 40 50.4 35.6 52 34 56.3 32.4 52 28 50.4 32.4 48.8Z"/>
+  </g>
+  <text x="58" y="33" font-family="Amiri, Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" fill="#ECDFCC" letter-spacing="-0.5">ùmmet</text>
+</svg>

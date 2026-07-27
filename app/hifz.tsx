@@ -222,14 +222,14 @@ export default function HifzScreen() {
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                   <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
                     <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: data.memorized ? "rgba(244,63,94,0.15)" : "rgba(10,24,18,0.7)", alignItems: "center", justifyContent: "center" }}>
-                      <Text style={{ color: data.memorized ? "#F43F5E" : "#6B7280", fontSize: 13, fontWeight: "800" }}>{idx + 1}</Text>
+                      <Text style={{ color: data.memorized ? "#F43F5E" : "#8A9BA8", fontSize: 13, fontWeight: "800" }}>{idx + 1}</Text>
                     </View>
                     <View style={{ marginLeft: 12, flex: 1 }}>
                       <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "700" }}>{surah.name}</Text>
-                      <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 2 }}>{surah.ayahCount} ayet</Text>
+                      <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 2 }}>{surah.ayahCount} ayet</Text>
                     </View>
                   </View>
-                  <Text style={{ color: data.memorized ? "#F43F5E" : "#6B7280", fontSize: 16, textAlign: "right", flex: 1 }} numberOfLines={1}>
+                  <Text style={{ color: data.memorized ? "#F43F5E" : "#8A9BA8", fontSize: 16, textAlign: "right", flex: 1 }} numberOfLines={1}>
                     {surah.arabic}
                   </Text>
                 </View>

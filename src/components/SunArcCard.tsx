@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { PrayerTimeEntry } from "../services/prayerTimes";
 import { fetchPrayerTimesForDate } from "../services/prayerTimes";
+import { toDateKey } from "../utils/dateKey";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -111,10 +112,10 @@ function formatDateLabel(date: Date): string {
   const today = new Date();
   const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
   const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-  const d = date.toISOString().split("T")[0];
-  if (d === today.toISOString().split("T")[0]) return "Bugün";
-  if (d === tomorrow.toISOString().split("T")[0]) return "Yarın";
-  if (d === yesterday.toISOString().split("T")[0]) return "Dün";
+  const d = toDateKey(date);
+  if (d === toDateKey(today)) return "Bugün";
+  if (d === toDateKey(tomorrow)) return "Yarın";
+  if (d === toDateKey(yesterday)) return "Dün";
   return date.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
 }
 
@@ -123,7 +124,7 @@ function DayPrayerRow({ prayers, label, isToday, nextPrayerIdx }: { prayers: Pra
   const nowMin = now.getHours() * 60 + now.getMinutes();
   return (
     <View style={{ width: SCREEN_WIDTH - 40, marginRight: 12 }}>
-      <Text style={{ color: isToday ? "#D4AF37" : "#5A6B78", fontSize: 13, fontWeight: "700", marginBottom: 8, textAlign: "center" }}>{label}</Text>
+      <Text style={{ color: isToday ? "#D4AF37" : "#8A9BA8", fontSize: 13, fontWeight: "700", marginBottom: 8, textAlign: "center" }}>{label}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         {prayers.map((p, i) => {
           const meta = PRAYER_META[p.name];
@@ -133,9 +134,9 @@ function DayPrayerRow({ prayers, label, isToday, nextPrayerIdx }: { prayers: Pra
           return (
             <View key={p.name} style={{ alignItems: "center", flex: 1 }}>
               <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: isNext ? "rgba(212,175,55,0.15)" : isPast ? "rgba(45,106,79,0.15)" : "rgba(30,40,50,0.4)", alignItems: "center", justifyContent: "center" }}>
-                <MaterialCommunityIcons name={meta.icon} size={16} color={isNext ? "#D4AF37" : isPast ? "#8A9BA8" : "#3A4550"} />
+                <MaterialCommunityIcons name={meta.icon} size={16} color={isNext ? "#D4AF37" : isPast ? "#8A9BA8" : "#5A6B78"} />
               </View>
-              <Text style={{ color: isNext ? "#D4AF37" : isPast ? "#8A9BA8" : "#3A4550", fontSize: 9, fontWeight: "600", marginTop: 3 }}>{meta.label}</Text>
+              <Text style={{ color: isNext ? "#D4AF37" : isPast ? "#8A9BA8" : "#5A6B78", fontSize: 11, fontWeight: "600", marginTop: 3 }}>{meta.label}</Text>
               <Text style={{ color: isNext ? "#ECDFCC" : isPast ? "#ECDFCC" : "#4A5568", fontSize: 12, fontWeight: isPast || isNext ? "700" : "500", marginTop: 1 }}>{p.time}</Text>
             </View>
           );
@@ -208,8 +209,8 @@ export default function SunArcCard({ prayers, nextPrayer, locationName }: Props)
       <View style={{ alignItems: "center", marginBottom: 14, paddingHorizontal: 24 }}>
         <Text style={{ color: "#D4AF37", fontSize: 80, fontWeight: "800", letterSpacing: -4, lineHeight: 84 }}>{nextP.time}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-          <MaterialCommunityIcons name="timer-outline" size={20} color="#5A6B78" />
-          <Text style={{ color: "#5A6B78", fontSize: 22, marginLeft: 6, fontWeight: "600" }}>{remainingText}</Text>
+          <MaterialCommunityIcons name="timer-outline" size={20} color="#8A9BA8" />
+          <Text style={{ color: "#8A9BA8", fontSize: 22, marginLeft: 6, fontWeight: "600" }}>{remainingText}</Text>
         </View>
       </View>
 
@@ -307,7 +308,7 @@ export default function SunArcCard({ prayers, nextPrayer, locationName }: Props)
             <DayPrayerRow prayers={prevDay} label={formatDateLabel((() => { const d = new Date(); d.setDate(d.getDate() - 1); return d; })())} isToday={false} />
           ) : (
             <View style={{ width: SCREEN_WIDTH - 40, marginRight: 12, alignItems: "center", justifyContent: "center", height: 60 }}>
-              {loadingDays ? <ActivityIndicator size="small" color="#5A6B78" /> : <Text style={{ color: "#3A4550", fontSize: 12 }}>Veri yok</Text>}
+              {loadingDays ? <ActivityIndicator size="small" color="#8A9BA8" /> : <Text style={{ color: "#5A6B78", fontSize: 12 }}>Veri yok</Text>}
             </View>
           )}
           <DayPrayerRow prayers={prayers} label="Bugün" isToday={true} nextPrayerIdx={nextPrayer} />
@@ -315,7 +316,7 @@ export default function SunArcCard({ prayers, nextPrayer, locationName }: Props)
             <DayPrayerRow prayers={nextDay} label={formatDateLabel((() => { const d = new Date(); d.setDate(d.getDate() + 1); return d; })())} isToday={false} />
           ) : (
             <View style={{ width: SCREEN_WIDTH - 40, marginRight: 12, alignItems: "center", justifyContent: "center", height: 60 }}>
-              {loadingDays ? <ActivityIndicator size="small" color="#5A6B78" /> : <Text style={{ color: "#3A4550", fontSize: 12 }}>Veri yok</Text>}
+              {loadingDays ? <ActivityIndicator size="small" color="#8A9BA8" /> : <Text style={{ color: "#5A6B78", fontSize: 12 }}>Veri yok</Text>}
             </View>
           )}
         </ScrollView>

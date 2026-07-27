@@ -1,0 +1,284 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Tipografi: font AdminPanelProvider'daki ->font('Plus Jakarta Sans') ile yüklenir.
+   CSS @import burada çalışmaz — @source'lardan sonra geldiği için derlemede düşürülür. */
+
+/* Jakarta'nın harf aralığı geniş; başlıklarda biraz sıkıyoruz */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-wi-stats-overview-stat-value {
+    letter-spacing: -0.02em;
+}
+
+
+/* Ümmet kurumsal panel — marka: #0A0E17, #1B4332, #D4AF37 */
+
+/* Kenar çubuğu: koyu zemin, sade metin */
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar {
+    @apply bg-[#0a0e17] ring-white/10;
+}
+
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-group-label {
+    @apply text-[#5a6b78] uppercase tracking-wide text-xs;
+}
+
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item-btn > .fi-icon {
+    @apply text-[#8a9ba8];
+}
+
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item-btn > .fi-sidebar-item-label {
+    @apply text-[#ecdfcc];
+}
+
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover {
+    @apply bg-white/5;
+}
+
+/* Aktif menü: yeşil zemin + altın metin */
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    @apply bg-[#1b4332]/50;
+}
+
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-body:not(.fi-body-has-topbar) .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon {
+    @apply text-[#d4af37];
+}
+
+/* Marka logosu — Filament varsayılan 1.5rem yüksekliği özel logoyu eziyor */
+.fi-logo {
+    height: auto !important;
+    max-height: none;
+    overflow: visible;
+    line-height: 1;
+}
+
+.fi-logo .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+}
+
+.fi-logo .brand-logo__img {
+    display: block;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 22%;
+    box-shadow: 0 2px 10px rgba(10, 14, 23, 0.18);
+}
+
+.fi-logo .brand-logo__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    min-width: 0;
+}
+
+.fi-logo .brand-logo__word {
+    font-family: Amiri, Georgia, 'Times New Roman', serif;
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    white-space: nowrap;
+}
+
+.fi-logo .brand-logo__sub {
+    font-family: inherit;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #1b4332;
+    white-space: nowrap;
+}
+
+/* Sidebar üstü: koyu marka şeridi */
+.fi-sidebar-header-ctn {
+    flex-shrink: 0;
+}
+
+.fi-sidebar-header {
+    @apply bg-[#0a0e17] px-4 py-4;
+    min-height: auto;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fi-sidebar-header-logo-ctn {
+    flex: 1;
+    min-width: 0;
+}
+
+.fi-sidebar-header-logo-ctn a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.fi-sidebar-header .fi-logo .brand-logo__word {
+    color: #ecdfcc;
+}
+
+.fi-sidebar-header .fi-logo .brand-logo__sub {
+    color: #d4af37;
+}
+
+.fi-sidebar-header .fi-logo .brand-logo__img {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* Üst çubuk: kompakt yatay logo */
+.fi-topbar .fi-logo .brand-logo__sub {
+    display: none;
+}
+
+.fi-topbar .fi-logo .brand-logo__img {
+    width: 2rem;
+    height: 2rem;
+}
+
+.fi-topbar .fi-logo .brand-logo__word {
+    font-size: 1.25rem;
+    color: #0a0e17;
+}
+
+.fi-topbar .fi-logo .brand-logo {
+    gap: 0.625rem;
+}
+
+/* Giriş ekranı — ortalı form */
+.ummet-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: #f4f4f5;
+}
+
+.ummet-login__center {
+    width: 100%;
+    max-width: 26rem;
+}
+
+.ummet-login__card.fi-simple-main {
+    width: 100%;
+    margin: 0;
+    padding: clamp(1.75rem, 4vw, 2.25rem);
+    border-radius: 1rem;
+    border: 1px solid rgba(24, 24, 27, 0.08);
+    background: #fff;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 12px 40px rgba(10, 14, 23, 0.08);
+    ring: none;
+}
+
+.ummet-login .fi-simple-page {
+    background: transparent;
+    padding: 0;
+}
+
+.ummet-login .fi-simple-page-content {
+    gap: 1.25rem;
+}
+
+.ummet-login .fi-simple-header {
+    text-align: center;
+    align-items: center;
+}
+
+.ummet-login .fi-logo .brand-logo {
+    justify-content: center;
+}
+
+.ummet-login .fi-logo .brand-logo__word {
+    color: #0a0e17;
+}
+
+.ummet-login .fi-logo .brand-logo__sub {
+    color: #1b4332;
+}
+
+.ummet-login .fi-input-wrp {
+    border-radius: 0.625rem;
+}
+
+.ummet-login .fi-btn.fi-color-primary {
+    @apply bg-[#1b4332] text-white hover:bg-[#2d6a4f] hover:text-white;
+    border-radius: 0.625rem;
+    font-weight: 600;
+    padding-block: 0.625rem;
+    color: #fff;
+}
+
+.ummet-login .fi-btn.fi-color-primary .fi-btn-label {
+    color: #fff;
+}
+
+/* Diğer basit sayfalar (şifre sıfırlama vb.) */
+.fi-simple-page:not(.ummet-login .fi-simple-page) {
+    @apply bg-zinc-50;
+}
+
+.fi-simple-main:not(.ummet-login__card) {
+    @apply ring-zinc-200/80 shadow-sm;
+}
+
+/* Üst çubuk: açık zemin */
+.fi-topbar {
+    @apply bg-white border-b border-zinc-200/80 shadow-none;
+}
+
+/* İçerik alanı: hafif gri zemin */
+.fi-main-ctn {
+    @apply bg-zinc-50;
+}
+
+/* Birincil butonlar: koyu yeşil, kurumsal */
+.fi-btn.fi-color-primary {
+    @apply shadow-sm;
+}
+
+/* Tarih seçici — kurumsal takvim paneli */
+.fi-fo-date-time-picker-panel {
+    @apply rounded-xl border border-zinc-200/80 bg-white shadow-lg;
+}
+
+.fi-fo-date-time-picker-calendar-day.fi-selected {
+    @apply bg-[#1b4332] text-white;
+}
+
+.fi-fo-date-time-picker-calendar-day.fi-focused:not(.fi-selected) {
+    @apply bg-[#1b4332]/10 text-[#1b4332];
+}
+
+.fi-fo-date-time-picker-calendar-day-today:not(.fi-selected) {
+    @apply ring-1 ring-[#d4af37];
+}
+
+.fi-fo-date-time-picker-trigger {
+    @apply rounded-lg;
+}
+
+.fi-fo-date-time-picker-display-text-input {
+    @apply cursor-pointer;
+}
+
+.fi-wi-stats-overview-stat-chart {
+    @apply opacity-90;
+}
+.fi-resource-create-record-page .fi-sc,
+.fi-resource-edit-record-page .fi-sc,
+.fi-resource-view-record-page .fi-sc {
+    @apply max-w-5xl;
+}

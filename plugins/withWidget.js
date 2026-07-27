@@ -7,6 +7,9 @@ const WIDGET_BUNDLE_ID = "com.ummet.app.widget";
 const TEAM_ID = "WZ3W8Y7U6Z";
 
 function withWidget(config) {
+  const marketingVersion = config.version ?? "1.0.0";
+  const buildNumber = config.ios?.buildNumber ?? "1";
+
   // 1. Widget dosyalarını ios/ klasörüne kopyala
   config = withDangerousMod(config, [
     "ios",
@@ -54,9 +57,9 @@ function withWidget(config) {
   <key>CFBundlePackageType</key>
   <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.0.0</string>
+  <string>${marketingVersion}</string>
   <key>CFBundleVersion</key>
-  <string>1</string>
+  <string>${buildNumber}</string>
   <key>NSExtension</key>
   <dict>
     <key>NSExtensionPointIdentifier</key>
@@ -102,14 +105,14 @@ function withWidget(config) {
       CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER: "YES",
       CLANG_WARN_UNGUARDED_AVAILABILITY: "YES_AGGRESSIVE",
       CODE_SIGN_STYLE: "Automatic",
-      CURRENT_PROJECT_VERSION: "1",
+      CURRENT_PROJECT_VERSION: buildNumber,
       DEVELOPMENT_TEAM: TEAM_ID,
       GCC_C_LANGUAGE_STANDARD: "gnu17",
       GENERATE_INFOPLIST_FILE: "NO",
       INFOPLIST_FILE: `"${WIDGET_NAME}/Info.plist"`,
       IPHONEOS_DEPLOYMENT_TARGET: "16.0",
       LOCALIZATION_PREFERS_STRING_CATALOGS: "YES",
-      MARKETING_VERSION: "1.0.0",
+      MARKETING_VERSION: marketingVersion,
       PRODUCT_BUNDLE_IDENTIFIER: `"${WIDGET_BUNDLE_ID}"`,
       PRODUCT_NAME: `"$(TARGET_NAME)"`,
       SKIP_INSTALL: "YES",

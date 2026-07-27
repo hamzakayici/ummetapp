@@ -25,7 +25,8 @@
         "NSMotionUsageDescription": "Kıble pusulası için sensör erişimi gereklidir.",
         "UIBackgroundModes": [
           "audio"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       },
       "appleTeamId": "WZ3W8Y7U6Z"
     },
@@ -58,7 +59,8 @@
       "./plugins/withWidget",
       "expo-notifications",
       "./plugins/withEzanSounds",
-      "expo-updates"
+      "expo-updates",
+      "@sentry/react-native"
     ],
     "extra": {
       "router": {},

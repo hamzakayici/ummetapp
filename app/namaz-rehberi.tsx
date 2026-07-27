@@ -136,7 +136,7 @@ function KindBadge({ kind }: { kind: string }) {
 
   return (
     <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: config.bg }}>
-      <Text style={{ color: config.color, fontSize: 10, fontWeight: "700" }}>{config.label}</Text>
+      <Text style={{ color: config.color, fontSize: 12, fontWeight: "700" }}>{config.label}</Text>
     </View>
   );
 }
@@ -185,7 +185,7 @@ export default function NamazRehberiScreen() {
               ].map((item) => (
                 <View key={item.label} style={{ alignItems: "center" }}>
                   <Text style={{ color: item.color, fontSize: 22, fontWeight: "800" }}>{item.count}</Text>
-                  <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: "600" }}>{item.label}</Text>
+                  <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: "600" }}>{item.label}</Text>
                 </View>
               ))}
             </View>
@@ -207,7 +207,7 @@ export default function NamazRehberiScreen() {
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "700" }}>{item.step}</Text>
                     <View style={{ marginLeft: 8, backgroundColor: "rgba(59,130,246,0.15)", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
-                      <Text style={{ color: "#3B82F6", fontSize: 10, fontWeight: "700" }}>{idx + 1}/8</Text>
+                      <Text style={{ color: "#3B82F6", fontSize: 12, fontWeight: "700" }}>{idx + 1}/8</Text>
                     </View>
                   </View>
                   <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginTop: 4, lineHeight: 20 }}>{item.desc}</Text>
@@ -241,14 +241,14 @@ export default function NamazRehberiScreen() {
                     </View>
                     <View style={{ marginLeft: 12, flex: 1 }}>
                       <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "700" }}>{prayer.name}</Text>
-                      <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 2 }}>{prayer.time}</Text>
+                      <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 2 }}>{prayer.time}</Text>
                     </View>
                   </View>
                   <View style={{ alignItems: "center", marginRight: 8 }}>
                     <Text style={{ color: prayer.color, fontSize: 20, fontWeight: "800" }}>{prayer.totalRakat}</Text>
-                    <Text style={{ color: "#6B7280", fontSize: 10 }}>rekat</Text>
+                    <Text style={{ color: "#8A9BA8", fontSize: 12 }}>rekat</Text>
                   </View>
-                  <Ionicons name={expandedPrayer === idx ? "chevron-up" : "chevron-down"} size={20} color="#6B7280" />
+                  <Ionicons name={expandedPrayer === idx ? "chevron-up" : "chevron-down"} size={20} color="#8A9BA8" />
                 </View>
 
                 {expandedPrayer === idx && (

@@ -6,6 +6,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { getAnnouncementsCached, refreshAnnouncements, type Announcement } from "../../src/services/remoteConfig";
+import * as Application from "expo-application";
 
 const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 85 : 65;
 
@@ -56,6 +57,7 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
   {
     title: "Destek & İletişim",
     items: [
+      { icon: "heart-outline", iconColor: "#D4AF37", title: "Ümmet'i Destekle", subtitle: "Gönüllü destek — ibadet her zaman ücretsiz", route: "/support" },
       { icon: "bullhorn-outline", iconColor: "#D4AF37", title: "Duyurular", subtitle: "Tüm duyuruları görüntüle", route: "/announcements" },
       { icon: "email-outline", iconColor: "#3B82F6", title: "Bize Yazın", subtitle: "Öneri ve şikayetlerinizi iletin", route: "/contact" },
       { icon: "star-outline", iconColor: "#F59E0B", title: "Uygulamayı Değerlendir", subtitle: "App Store'da bizi değerlendirin", route: "rate" },
@@ -125,7 +127,7 @@ function MenuItemComponent({ item, index, sectionIndex }: { item: MenuItem; inde
             <Text className="text-text-primary font-reem-medium text-base">{item.title}</Text>
             <Text className="text-text-secondary font-inter text-xs" style={{ marginTop: 2 }}>{item.subtitle}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={16} color="#5A6B78" />
+          <Ionicons name="chevron-forward" size={16} color="#8A9BA8" />
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -209,10 +211,10 @@ export default function MoreScreen() {
 
         {/* Version */}
         <View style={{ alignItems: "center", marginTop: 32, marginBottom: 16 }}>
-          <Text className="text-text-muted font-inter text-xs">Ümmet v1.0.0</Text>
+          <Text className="text-text-muted font-inter text-xs">Ümmet v{Application.nativeApplicationVersion ?? "—"}</Text>
           <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-            <MaterialCommunityIcons name="star-crescent" size={10} color="#5A6B78" />
-            <Text className="text-text-muted font-inter" style={{ fontSize: 10, marginLeft: 4 }}>Bismillahirrahmanirrahim</Text>
+            <MaterialCommunityIcons name="star-crescent" size={10} color="#8A9BA8" />
+            <Text className="text-text-muted font-inter" style={{ fontSize: 12, marginLeft: 4 }}>Bismillahirrahmanirrahim</Text>
           </View>
         </View>
       </ScrollView>

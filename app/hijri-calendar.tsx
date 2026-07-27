@@ -142,7 +142,7 @@ export default function HijriCalendarScreen() {
                   <Text style={{ color: "#FFFFFF", fontSize: 20, fontWeight: "700" }}>
                     {HIJRI_MONTHS[currentMonth - 1]}
                   </Text>
-                  <Text style={{ color: "#6B7280", fontSize: 14, marginTop: 2 }}>
+                  <Text style={{ color: "#8A9BA8", fontSize: 14, marginTop: 2 }}>
                     {HIJRI_MONTHS_AR[currentMonth - 1]} — {currentYear}
                   </Text>
                 </View>
@@ -166,7 +166,7 @@ export default function HijriCalendarScreen() {
                 <View key={day} style={{ flex: 1, alignItems: "center" }}>
                   <Text
                     style={{
-                      color: day === "Cum" ? "#A78BFA" : "#6B7280",
+                      color: day === "Cum" ? "#A78BFA" : "#8A9BA8",
                       fontSize: 13,
                       fontWeight: "600",
                     }}
@@ -321,8 +321,8 @@ export default function HijriCalendarScreen() {
                     alignItems: "center",
                   }}
                 >
-                  <MaterialCommunityIcons name="calendar-sync" size={18} color="#6B7280" />
-                  <Text style={{ color: "#6B7280", fontSize: 13, marginLeft: 8, flex: 1 }}>
+                  <MaterialCommunityIcons name="calendar-sync" size={18} color="#8A9BA8" />
+                  <Text style={{ color: "#8A9BA8", fontSize: 13, marginLeft: 8, flex: 1 }}>
                     Miladi karşılık: {monthDays[0].gregorian.toLocaleDateString("tr-TR", { day: "numeric", month: "long" })} — {monthDays[monthDays.length - 1].gregorian.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
                   </Text>
                 </View>

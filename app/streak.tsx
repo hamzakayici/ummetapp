@@ -6,6 +6,7 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useWeeklyStore } from "../src/stores/appStore";
+import { toDateKey } from "../src/utils/dateKey";
 
 // ViewShot — native modül yoksa null döner
 let ViewShot: any = null;
@@ -53,7 +54,7 @@ export default function StreakScreen() {
     for (let i = 41; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().split("T")[0];
+      const key = toDateKey(d);
       days.push({ key, date: d, done: weeklyStore.trackedDays?.[key] || false });
     }
     return days;
@@ -66,7 +67,7 @@ export default function StreakScreen() {
     for (let i = 0; i < 365; i++) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().split("T")[0];
+      const key = toDateKey(d);
       if (weeklyStore.trackedDays?.[key]) {
         streak++;
       } else {
@@ -130,12 +131,12 @@ export default function StreakScreen() {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
                   <MaterialCommunityIcons name="fire" size={48} color="#F97316" />
                   <View style={{ backgroundColor: "rgba(249,115,22,0.15)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                    <Text style={{ color: "#F97316", fontSize: 10, fontWeight: "700" }}>IslamicApp</Text>
+                    <Text style={{ color: "#F97316", fontSize: 12, fontWeight: "700" }}>IslamicApp</Text>
                   </View>
                 </View>
                 <Text style={{ color: "#FFFFFF", fontSize: 56, fontWeight: "800", marginTop: -10, letterSpacing: -2 }}>{currentStreak}</Text>
                 <Text style={{ color: "#F97316", fontSize: 16, fontWeight: "700" }}>Günlük Streak</Text>
-                <Text style={{ color: "#6B7280", fontSize: 13, marginTop: 4 }}>
+                <Text style={{ color: "#8A9BA8", fontSize: 13, marginTop: 4 }}>
                   {currentStreak === 0 ? "Bugün başlayın!" : `${currentStreak} gün ardışık ibadet`}
                 </Text>
               </LinearGradient>
@@ -149,12 +150,12 @@ export default function StreakScreen() {
                 <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
                   <MaterialCommunityIcons name="fire" size={48} color="#F97316" />
                   <View style={{ backgroundColor: "rgba(249,115,22,0.15)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                    <Text style={{ color: "#F97316", fontSize: 10, fontWeight: "700" }}>IslamicApp</Text>
+                    <Text style={{ color: "#F97316", fontSize: 12, fontWeight: "700" }}>IslamicApp</Text>
                   </View>
                 </View>
                 <Text style={{ color: "#FFFFFF", fontSize: 56, fontWeight: "800", marginTop: -10, letterSpacing: -2 }}>{currentStreak}</Text>
                 <Text style={{ color: "#F97316", fontSize: 16, fontWeight: "700" }}>Günlük Streak</Text>
-                <Text style={{ color: "#6B7280", fontSize: 13, marginTop: 4 }}>
+                <Text style={{ color: "#8A9BA8", fontSize: 13, marginTop: 4 }}>
                   {currentStreak === 0 ? "Bugün başlayın!" : `${currentStreak} gün ardışık ibadet`}
                 </Text>
               </LinearGradient>
@@ -178,17 +179,17 @@ export default function StreakScreen() {
             <View style={{ flex: 1, padding: 16, borderRadius: 14, backgroundColor: "rgba(10,24,18,0.8)", alignItems: "center" }}>
               <MaterialCommunityIcons name="trophy" size={22} color="#EAB308" />
               <Text style={{ color: "#FFFFFF", fontSize: 24, fontWeight: "800", marginTop: 6 }}>{longestStreak}</Text>
-              <Text style={{ color: "#6B7280", fontSize: 12, fontWeight: "600" }}>En Uzun</Text>
+              <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600" }}>En Uzun</Text>
             </View>
             <View style={{ flex: 1, padding: 16, borderRadius: 14, backgroundColor: "rgba(10,24,18,0.8)", alignItems: "center" }}>
               <MaterialCommunityIcons name="calendar-check" size={22} color="#10B981" />
               <Text style={{ color: "#FFFFFF", fontSize: 24, fontWeight: "800", marginTop: 6 }}>{totalDays}</Text>
-              <Text style={{ color: "#6B7280", fontSize: 12, fontWeight: "600" }}>Toplam Gün</Text>
+              <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600" }}>Toplam Gün</Text>
             </View>
             <View style={{ flex: 1, padding: 16, borderRadius: 14, backgroundColor: "rgba(10,24,18,0.8)", alignItems: "center" }}>
               <MaterialCommunityIcons name="percent" size={22} color="#3B82F6" />
               <Text style={{ color: "#FFFFFF", fontSize: 24, fontWeight: "800", marginTop: 6 }}>{calendarDays.length > 0 ? Math.round((calendarDays.filter((d) => d.done).length / calendarDays.length) * 100) : 0}</Text>
-              <Text style={{ color: "#6B7280", fontSize: 12, fontWeight: "600" }}>6 Hafta %</Text>
+              <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600" }}>6 Hafta %</Text>
             </View>
           </View>
         </Animated.View>
@@ -202,7 +203,7 @@ export default function StreakScreen() {
             {/* Gün başlıkları */}
             <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 8 }}>
               {["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((d) => (
-                <Text key={d} style={{ color: "#6B7280", fontSize: 10, fontWeight: "600", width: 30, textAlign: "center" }}>{d}</Text>
+                <Text key={d} style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600", width: 30, textAlign: "center" }}>{d}</Text>
               ))}
             </View>
             {/* Hücreler */}
@@ -225,7 +226,7 @@ export default function StreakScreen() {
                         opacity: item.done ? 1 : 0.3,
                       }}
                     >
-                      <Text style={{ color: item.done ? "#FFF" : "#6B7280", fontSize: 10, fontWeight: "700" }}>
+                      <Text style={{ color: item.done ? "#FFF" : "#8A9BA8", fontSize: 12, fontWeight: "700" }}>
                         {item.date.getDate()}
                       </Text>
                     </View>

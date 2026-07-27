@@ -93,7 +93,7 @@ export default function HadisScreen() {
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingTop: 14, paddingBottom: 4 }}>
           <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(139,92,246,0.1)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 }}>
             <MaterialCommunityIcons name={CATEGORY_ICONS[hadis.category] || "tag"} size={12} color="#8B5CF6" />
-            <Text style={{ color: "#8B5CF6", fontSize: 11, fontWeight: "700", marginLeft: 5 }}>{hadis.category}</Text>
+            <Text style={{ color: "#8B5CF6", fontSize: 12, fontWeight: "700", marginLeft: 5 }}>{hadis.category}</Text>
           </View>
           <TouchableOpacity onPress={() => toggleFav(hadis.id)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Ionicons name={isFav ? "heart" : "heart-outline"} size={22} color={isFav ? "#E53935" : "rgba(255,255,255,0.25)"} />
@@ -140,12 +140,12 @@ export default function HadisScreen() {
 
         {/* Arama */}
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 14, backgroundColor: "rgba(10,24,18,0.8)", borderRadius: 12, paddingHorizontal: 14, height: 44 }}>
-          <Ionicons name="search" size={16} color="#6B7280" />
+          <Ionicons name="search" size={16} color="#8A9BA8" />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Hadis ara..."
-            placeholderTextColor="#6B7280"
+            placeholderTextColor="#8A9BA8"
             style={{ flex: 1, color: "#FFFFFF", fontSize: 15, marginLeft: 10 }}
           />
         </View>
@@ -189,8 +189,8 @@ export default function HadisScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
         ListEmptyComponent={
           <View style={{ alignItems: "center", paddingTop: 60 }}>
-            <MaterialCommunityIcons name="book-search" size={48} color="#6B7280" />
-            <Text style={{ color: "#6B7280", fontSize: 15, marginTop: 12 }}>Hadis bulunamadı</Text>
+            <MaterialCommunityIcons name="book-search" size={48} color="#8A9BA8" />
+            <Text style={{ color: "#8A9BA8", fontSize: 15, marginTop: 12 }}>Hadis bulunamadı</Text>
           </View>
         }
       />

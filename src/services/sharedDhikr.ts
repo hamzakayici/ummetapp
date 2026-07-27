@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+import { api } from "./api";
+import { getAnalyticsDeviceId } from "./analytics";
 
 export interface SharedDhikr {
   id: string;
@@ -7,74 +8,100 @@ export interface SharedDhikr {
   target_count: number;
   current_count: number;
   share_code: string;
+  progress?: number;
   creator_device_id?: string;
   created_at?: string;
 }
 
-// Yeni bir kampanya üretimi
+type Envelope = { data: SharedDhikr };
+
+/**
+ * Ortak zikir servisi.
+ *
+ * NOT: Eski sürüm Supabase Realtime (WebSocket) ile canlı sayaç gösteriyordu.
+ * Yeni backend paylaşımlı hostingde çalıştığı için kalıcı WebSocket süreci yok;
+ * ekran açıkken `pollSharedDhikr` ile periyodik olarak okuyoruz.
+ */
+
 export const createSharedDhikr = async (
   title: string,
   presetName: string,
   targetCount: number,
   deviceId?: string
-): Promise<{ data: SharedDhikr | null; error: any }> => {
-  // Rastgele 6 haneli kod
-  const shareCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+): Promise<{ data: SharedDhikr | null; error: Error | null }> => {
+  const { data, error } = await api.post<Envelope>("/shared-dhikrs", {
+    title,
+    preset_name: presetName,
+    target_count: targetCount,
+    device_id: deviceId,
+  });
 
-  const { data, error } = await supabase
-    .from("shared_dhikrs")
-    .insert([
-      {
-        title,
-        preset_name: presetName,
-        target_count: targetCount,
-        share_code: shareCode,
-        creator_device_id: deviceId,
-      },
-    ])
-    .select()
-    .single();
-
-  return { data, error };
+  return { data: data?.data ?? null, error };
 };
 
-// Koda göre kampanyayı bulma
 export const getSharedDhikrByCode = async (
   code: string
-): Promise<{ data: SharedDhikr | null; error: any }> => {
-  const { data, error } = await supabase
-    .from("shared_dhikrs")
-    .select("*")
-    .ilike("share_code", code.trim())
-    .single();
+): Promise<{ data: SharedDhikr | null; error: Error | null }> => {
+  const { data, error } = await api.get<Envelope>(
+    `/shared-dhikrs/${encodeURIComponent(code.trim().toUpperCase())}`
+  );
 
-  return { data, error };
+  return { data: data?.data ?? null, error };
 };
 
 export const getSharedDhikrById = async (
   id: string
-): Promise<{ data: SharedDhikr | null; error: any }> => {
-  const { data, error } = await supabase
-    .from("shared_dhikrs")
-    .select("*")
-    .eq("id", id)
-    .single();
+): Promise<{ data: SharedDhikr | null; error: Error | null }> => {
+  const { data, error } = await api.get<Envelope>(`/shared-dhikrs/${encodeURIComponent(id)}`);
 
-  return { data, error };
+  return { data: data?.data ?? null, error };
 };
 
-// Cihazın / Kullanıcının daha önce katıldığı veya oluşturduğu zikirleri listelemek 
-// (Yerel AsyncStorage'da ID tutmak daha mantıklı anonimlik olduğu için, bunu State üzerinden çözeceğiz)
+/**
+ * Sayaç artırma. Sunucu tarafında atomik UPDATE ile yapılır —
+ * aynı anda yüzlerce kişi bassa da hiçbir katkı kaybolmaz.
+ */
+export const incrementSharedDhikr = async (
+  id: string,
+  amount: number,
+  deviceId?: string
+): Promise<SharedDhikr | null> => {
+  const device_id = deviceId ?? (await getAnalyticsDeviceId());
 
-// Toplu Artırma: 
-// Butona her basıldığında network call yaparsak hem kotayı hızlı doldururuz hem de performansı etkileriz.
-// O yüzden batch işlemi yapmalıyız. 
-export const incrementSharedDhikr = async (id: string, amount: number) => {
-  const { error } = await supabase.rpc("increment_shared_dhikr", {
-    dhikr_id: id,
-    amount: amount,
-  });
+  const { data, error } = await api.post<Envelope>(
+    `/shared-dhikrs/${encodeURIComponent(id)}/increment`,
+    { amount, device_id }
+  );
+
   if (error) {
-    console.error("Zikir arttırma hatası:", error);
+    console.warn("Zikir artırma hatası:", error.message);
+    return null;
   }
+
+  return data?.data ?? null;
+};
+
+/**
+ * Realtime yerine periyodik okuma. Ekran açıkken çağrılır, dönen fonksiyon
+ * durdurur. Varsayılan 4 sn — canlı hissi verirken sunucuyu yormaz.
+ */
+export const pollSharedDhikr = (
+  id: string,
+  onUpdate: (dhikr: SharedDhikr) => void,
+  intervalMs = 4000
+): (() => void) => {
+  let stopped = false;
+
+  const tick = async () => {
+    if (stopped) return;
+    const { data } = await getSharedDhikrById(id);
+    if (!stopped && data) onUpdate(data);
+  };
+
+  const timer = setInterval(tick, intervalMs);
+
+  return () => {
+    stopped = true;
+    clearInterval(timer);
+  };
 };

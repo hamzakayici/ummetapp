@@ -9,6 +9,7 @@ import { hapticImpact, ImpactFeedbackStyle } from "../src/utils/haptics";
 import { useQuranSettingsStore, QURAN_THEMES, ARABIC_FONTS } from "../src/stores/appStore";
 import type { QuranTheme, ArabicFontKey } from "../src/stores/appStore";
 import { playAyah, stopQuranAudio, isQuranPlaying } from "../src/services/audioService";
+import { captureError } from "../src/services/errorTracking";
 
 const CACHE_KEY = "@ummet_mushaf_full_v2";
 const TOTAL_PAGES = 604;
@@ -35,6 +36,7 @@ export default function QuranReaderScreen() {
   const [pages, setPages] = useState<MushafPage[]>([]);
   const [currentPage, setCurrentPage] = useState(lastPage || 1);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showHeader, setShowHeader] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showMeal, setShowMeal] = useState(false);
@@ -55,6 +57,8 @@ export default function QuranReaderScreen() {
   useEffect(() => { loadAllPages(); }, []);
 
   async function loadAllPages() {
+    setLoadError(null);
+    setLoading(true);
     try {
       const cached = await AsyncStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -79,7 +83,9 @@ export default function QuranReaderScreen() {
       clearTimeout(timeoutId);
       const [arData, trData] = await Promise.all([arRes.json(), trRes.json()]);
 
-      if (arData.code !== 200 || trData.code !== 200) throw new Error("API error");
+      if (arData.code !== 200 || trData.code !== 200) {
+        throw new Error("Kuran metni sunucusu beklenmeyen yanıt döndürdü.");
+      }
 
       const pageMap: Record<number, PageAyah[]> = {};
       const trMap: Record<number, string> = {};
@@ -113,7 +119,19 @@ export default function QuranReaderScreen() {
       setPages(mushafPages);
       setLoading(false);
       AsyncStorage.setItem(CACHE_KEY, JSON.stringify(mushafPages)).catch(() => {});
-    } catch {
+    } catch (e) {
+      // Kullanıcıya hata ekranı gösteriliyor ama sebebini de bilmeliyiz:
+      // API mi çöktü, ağ mı yavaş, ayrıştırma mı bozuldu?
+      captureError("quranReader:loadPages", e);
+      // Önceden burada sessizce setLoading(false) yapılıyordu; kullanıcı boş
+      // beyaz ekran görüyor ve ne olduğunu anlamıyordu. Artık ne olduğunu
+      // söylüyor ve tekrar deneme imkânı veriyoruz.
+      const offline = e instanceof Error && e.name === "AbortError";
+      setLoadError(
+        offline
+          ? "Bağlantı çok yavaş göründüğü için Kuran metni indirilemedi."
+          : "Kuran metni indirilemedi. İnternet bağlantınızı kontrol edin."
+      );
       setLoading(false);
     }
   }
@@ -231,10 +249,10 @@ export default function QuranReaderScreen() {
           <View style={{ height: 2, backgroundColor: colors.accent, opacity: 0.15, marginBottom: 8, borderRadius: 1 }} />
 
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14, paddingHorizontal: 2 }}>
-            <Text style={{ color: colors.secondary, fontSize: 11, fontWeight: "600" }}>
+            <Text style={{ color: colors.secondary, fontSize: 12, fontWeight: "600" }}>
               {item.ayahs.length > 0 ? item.ayahs[0].surahName : ""}
             </Text>
-            <Text style={{ color: lastPage === item.page ? colors.accent : colors.secondary, fontSize: 11, fontWeight: "600" }}>
+            <Text style={{ color: lastPage === item.page ? colors.accent : colors.secondary, fontSize: 12, fontWeight: "600" }}>
               {item.page}
             </Text>
           </View>
@@ -334,7 +352,7 @@ export default function QuranReaderScreen() {
             </TouchableOpacity>
             <View style={{ flex: 1, marginLeft: 10 }}>
               <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>Mushaf-ı Şerif</Text>
-              <Text style={{ color: colors.secondary, fontSize: 11, marginTop: 1 }}>
+              <Text style={{ color: colors.secondary, fontSize: 12, marginTop: 1 }}>
                 Sayfa {currentPage} / {TOTAL_PAGES}
               </Text>
             </View>
@@ -377,7 +395,7 @@ export default function QuranReaderScreen() {
                     <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: QURAN_THEMES[t].bg, borderWidth: theme === t ? 2.5 : 1, borderColor: theme === t ? colors.accent : `${colors.secondary}30`, alignItems: "center", justifyContent: "center" }}>
                       {theme === t && <Ionicons name="checkmark" size={16} color={QURAN_THEMES[t].accent} />}
                     </View>
-                    <Text style={{ color: theme === t ? colors.accent : colors.secondary, fontSize: 10, marginTop: 4, fontWeight: "600" }}>{QURAN_THEMES[t].name}</Text>
+                    <Text style={{ color: theme === t ? colors.accent : colors.secondary, fontSize: 12, marginTop: 4, fontWeight: "600" }}>{QURAN_THEMES[t].name}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -394,7 +412,7 @@ export default function QuranReaderScreen() {
                   <Text style={{ color: colors.text, fontSize: 20, fontWeight: "700" }}>A+</Text>
                 </TouchableOpacity>
               </View>
-              <Text style={{ color: colors.secondary, fontSize: 11, textAlign: "center", marginTop: 6 }}>{fontSize}pt</Text>
+              <Text style={{ color: colors.secondary, fontSize: 12, textAlign: "center", marginTop: 6 }}>{fontSize}pt</Text>
 
               <Text style={{ color: colors.secondary, fontSize: 12, fontWeight: "600", marginTop: 14, marginBottom: 8 }}>Yazı Tipi</Text>
               <View style={{ gap: 6 }}>
@@ -406,7 +424,7 @@ export default function QuranReaderScreen() {
                       <View style={{ flexDirection: "row", alignItems: "center", padding: 10, borderRadius: 10, backgroundColor: isSelected ? `${colors.accent}12` : `${colors.secondary}08`, borderWidth: isSelected ? 1.5 : 1, borderColor: isSelected ? `${colors.accent}40` : `${colors.secondary}15` }}>
                         <View style={{ flex: 1 }}>
                           <Text style={{ color: isSelected ? colors.accent : colors.text, fontSize: 13, fontWeight: "700" }}>{f.name}</Text>
-                          <Text style={{ color: colors.secondary, fontSize: 10, marginTop: 2 }}>{f.desc}</Text>
+                          <Text style={{ color: colors.secondary, fontSize: 12, marginTop: 2 }}>{f.desc}</Text>
                         </View>
                         <Text style={{ color: colors.text, fontSize: 18, fontFamily: f.family }}>بِسْمِ اللَّهِ</Text>
                         {isSelected && <Ionicons name="checkmark-circle" size={18} color={colors.accent} style={{ marginLeft: 8 }} />}
@@ -420,11 +438,36 @@ export default function QuranReaderScreen() {
         </View>
       )}
 
-      {loading ? (
+      {loadError ? (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.bg, paddingHorizontal: 32 }}>
+          <MaterialCommunityIcons name="wifi-off" size={44} color={colors.secondary} />
+          <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginTop: 16, textAlign: "center" }}>
+            Mushaf açılamadı
+          </Text>
+          <Text style={{ color: colors.secondary, fontSize: 13, marginTop: 8, textAlign: "center", lineHeight: 20 }}>
+            {loadError}
+          </Text>
+          <Text style={{ color: `${colors.secondary}99`, fontSize: 12, marginTop: 12, textAlign: "center", lineHeight: 17 }}>
+            Metin bir kez indirildikten sonra internet olmadan da okuyabilirsiniz.
+          </Text>
+
+          <TouchableOpacity
+            onPress={loadAllPages}
+            activeOpacity={0.8}
+            style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 28, borderRadius: 14, backgroundColor: colors.accent }}
+          >
+            <Text style={{ color: colors.bg, fontWeight: "700", fontSize: 15 }}>Tekrar dene</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={{ marginTop: 14 }}>
+            <Text style={{ color: colors.secondary, fontSize: 13 }}>Geri dön</Text>
+          </TouchableOpacity>
+        </View>
+      ) : loading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.bg }}>
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={{ color: colors.secondary, fontSize: 14, marginTop: 14 }}>Mushaf yükleniyor...</Text>
-          <Text style={{ color: `${colors.secondary}80`, fontSize: 11, marginTop: 8 }}>İlk açılışta yüklenir, sonra anında açılır</Text>
+          <Text style={{ color: `${colors.secondary}80`, fontSize: 12, marginTop: 8 }}>İlk açılışta yüklenir, sonra anında açılır</Text>
         </View>
       ) : (
         <FlatList
@@ -459,7 +502,7 @@ export default function QuranReaderScreen() {
             style={{ backgroundColor: `${colors.bg}DD`, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: `${colors.accent}15`, flexDirection: "row", alignItems: "center", gap: 4 }}
           >
             <Ionicons name={isPlayingAll ? "stop" : "play"} size={12} color={colors.accent} />
-            <Text style={{ color: colors.accent, fontSize: 11, fontWeight: "600" }}>{isPlayingAll ? "Durdur" : "Dinle"}</Text>
+            <Text style={{ color: colors.accent, fontSize: 12, fontWeight: "600" }}>{isPlayingAll ? "Durdur" : "Dinle"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setShowHeader(true)}

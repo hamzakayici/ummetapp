@@ -91,7 +91,7 @@ export default function MosquesScreen() {
               backgroundColor: isNear ? "rgba(45,106,79,0.2)" : "rgba(27,67,50,0.15)",
               alignItems: "center", justifyContent: "center", marginRight: 14,
             }}>
-              <MaterialCommunityIcons name="mosque" size={22} color={isNear ? "#40C057" : "#5A6B78"} />
+              <MaterialCommunityIcons name="mosque" size={22} color={isNear ? "#40C057" : "#8A9BA8"} />
             </View>
 
             {/* Bilgi */}
@@ -105,8 +105,8 @@ export default function MosquesScreen() {
                 </Text>
               )}
               <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-                <MaterialCommunityIcons name="map-marker-distance" size={13} color={isNear ? "#40C057" : "#5A6B78"} />
-                <Text style={{ color: isNear ? "#40C057" : "#5A6B78", fontSize: 12, fontWeight: "600", marginLeft: 4 }}>
+                <MaterialCommunityIcons name="map-marker-distance" size={13} color={isNear ? "#40C057" : "#8A9BA8"} />
+                <Text style={{ color: isNear ? "#40C057" : "#8A9BA8", fontSize: 12, fontWeight: "600", marginLeft: 4 }}>
                   {formatDistance(item.distance)}
                 </Text>
               </View>
@@ -127,14 +127,14 @@ export default function MosquesScreen() {
             <View style={{ flexDirection: "row", marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.04)", gap: 12 }}>
               {item.phone && (
                 <TouchableOpacity onPress={() => Linking.openURL(`tel:${item.phone}`)} style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Ionicons name="call-outline" size={13} color="#5A6B78" />
-                  <Text style={{ color: "#5A6B78", fontSize: 12, marginLeft: 4 }}>{item.phone}</Text>
+                  <Ionicons name="call-outline" size={13} color="#8A9BA8" />
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, marginLeft: 4 }}>{item.phone}</Text>
                 </TouchableOpacity>
               )}
               {item.website && (
                 <TouchableOpacity onPress={() => Linking.openURL(item.website!)} style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Ionicons name="globe-outline" size={13} color="#5A6B78" />
-                  <Text style={{ color: "#5A6B78", fontSize: 12, marginLeft: 4 }}>Web Sitesi</Text>
+                  <Ionicons name="globe-outline" size={13} color="#8A9BA8" />
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, marginLeft: 4 }}>Web Sitesi</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -191,11 +191,11 @@ export default function MosquesScreen() {
       {loading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <ActivityIndicator size="large" color="#40C057" />
-          <Text style={{ color: "#5A6B78", fontSize: 14, marginTop: 12 }}>Yakındaki camiler aranıyor...</Text>
+          <Text style={{ color: "#8A9BA8", fontSize: 14, marginTop: 12 }}>Yakındaki camiler aranıyor...</Text>
         </View>
       ) : error ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
-          <MaterialCommunityIcons name="map-marker-off" size={48} color="#5A6B78" />
+          <MaterialCommunityIcons name="map-marker-off" size={48} color="#8A9BA8" />
           <Text style={{ color: "#ECDFCC", fontSize: 16, fontWeight: "600", textAlign: "center", marginTop: 14 }}>{error}</Text>
           <TouchableOpacity onPress={() => { setLoading(true); loadMosques(); }} style={{ marginTop: 16, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, backgroundColor: "rgba(45,106,79,0.3)" }}>
             <Text style={{ color: "#40C057", fontSize: 14, fontWeight: "600" }}>Tekrar Dene</Text>
@@ -211,8 +211,8 @@ export default function MosquesScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#40C057" />}
           ListEmptyComponent={
             <View style={{ alignItems: "center", paddingTop: 60 }}>
-              <MaterialCommunityIcons name="mosque" size={48} color="#5A6B78" />
-              <Text style={{ color: "#5A6B78", fontSize: 15, marginTop: 12 }}>Bu yarıçapta cami bulunamadı</Text>
+              <MaterialCommunityIcons name="mosque" size={48} color="#8A9BA8" />
+              <Text style={{ color: "#8A9BA8", fontSize: 15, marginTop: 12 }}>Bu yarıçapta cami bulunamadı</Text>
               <Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, marginTop: 4 }}>Yarıçapı artırmayı deneyin</Text>
             </View>
           }

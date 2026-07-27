@@ -16,6 +16,8 @@ import { hapticImpact, hapticNotification, ImpactFeedbackStyle, NotificationFeed
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useKazaStore, useWeeklyStore } from "../../src/stores/appStore";
+import { getTodayKey } from "../../src/utils/dateKey";
+import { maybeAskForReview } from "../../src/services/reviewPrompt";
 
 const { width } = Dimensions.get("window");
 const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 88 : 65;
@@ -100,11 +102,11 @@ function PrayerCard({
             {completed}
           </Text>
           <TouchableOpacity onPress={onSetTotal} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Text style={{ color: "#6B7280", fontSize: 12 }}>/ {total || "?"}</Text>
+            <Text style={{ color: "#8A9BA8", fontSize: 12 }}>/ {total || "?"}</Text>
           </TouchableOpacity>
           {total > 0 && (
             <View style={{ marginTop: 4, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, backgroundColor: isDone ? "rgba(64,192,87,0.15)" : "rgba(212,175,55,0.12)" }}>
-              <Text style={{ color: isDone ? "#40C057" : "#D4AF37", fontSize: 10, fontWeight: "700" }}>
+              <Text style={{ color: isDone ? "#40C057" : "#D4AF37", fontSize: 12, fontWeight: "700" }}>
                 %{progress.toFixed(0)}
               </Text>
             </View>
@@ -169,8 +171,8 @@ function PrayerCard({
                 flexDirection: "row",
               }}
             >
-              <Ionicons name="remove" size={16} color={completed > 0 ? "#E53935" : "#6B7280"} />
-              <Text style={{ color: completed > 0 ? "#E53935" : "#6B7280", fontSize: 14, fontWeight: "700", marginLeft: 4 }}>
+              <Ionicons name="remove" size={16} color={completed > 0 ? "#E53935" : "#8A9BA8"} />
+              <Text style={{ color: completed > 0 ? "#E53935" : "#8A9BA8", fontSize: 14, fontWeight: "700", marginLeft: 4 }}>
                 Geri Al
               </Text>
             </View>
@@ -206,7 +208,7 @@ export default function TrackerScreen() {
   const { prayers, fasting, incrementPrayer, decrementPrayer, setPrayerTotal, incrementFasting, incrementAdak, setFastingTotal, setAdakTotal } = useKazaStore();
   const { getWeekData, markToday, unmarkToday, trackedDays } = useWeeklyStore();
   const weekData = getWeekData();
-  const todayMarked = trackedDays[new Date().toISOString().split("T")[0]] || false;
+  const todayMarked = trackedDays[getTodayKey()] || false;
 
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -316,7 +318,7 @@ export default function TrackerScreen() {
             {totalOwed > 0 && (
               <View style={{ alignItems: "center", backgroundColor: "rgba(212,175,55,0.12)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 }}>
                 <Text style={{ color: "#D4AF37", fontSize: 18, fontWeight: "800" }}>%{overallProgress.toFixed(0)}</Text>
-                <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 9, fontWeight: "600" }}>İLERLEME</Text>
+                <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: "600" }}>İLERLEME</Text>
               </View>
             )}
           </View>
@@ -453,7 +455,7 @@ export default function TrackerScreen() {
                 <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "600" }}>
                   Günde 6 kaza kılarsanız: {daysToFinish} gün
                 </Text>
-                <Text style={{ color: "#6B7280", fontSize: 12, marginTop: 2 }}>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, marginTop: 2 }}>
                   Tahmini bitiş: {finishDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
                 </Text>
               </View>
@@ -641,7 +643,7 @@ export default function TrackerScreen() {
                   const active = weekData[i];
                   return (
                     <View key={day} style={{ alignItems: "center", gap: 6 }}>
-                      <Text style={{ color: active ? "#D4AF37" : "#6B7280", fontSize: 12, fontWeight: "600" }}>{day}</Text>
+                      <Text style={{ color: active ? "#D4AF37" : "#8A9BA8", fontSize: 12, fontWeight: "600" }}>{day}</Text>
                       <View
                         style={{
                           width: 36,
@@ -675,7 +677,22 @@ export default function TrackerScreen() {
             activeOpacity={0.7}
             onPress={() => {
               hapticImpact(ImpactFeedbackStyle.Medium);
-              todayMarked ? unmarkToday() : markToday();
+
+              if (todayMarked) {
+                unmarkToday();
+                return;
+              }
+
+              markToday();
+
+              // Haftanın 7 günü de tamamlandıysa: kullanıcı memnun, yorum sormak
+              // için doğru an. Kutlama bitsin diye biraz bekliyoruz.
+              const completedAfter = weekData.filter(Boolean).length + 1;
+              if (completedAfter >= 7) {
+                triggerConfetti();
+                hapticNotification(NotificationFeedbackType.Success);
+                setTimeout(() => void maybeAskForReview("streak_7"), 3000);
+              }
             }}
             style={{ marginHorizontal: 16, marginTop: 12 }}
           >

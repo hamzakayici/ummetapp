@@ -59,14 +59,14 @@ function AnimatedTab({
         <MaterialCommunityIcons
           name={icon}
           size={isFocused ? 26 : 21}
-          color={isFocused ? "#D4AF37" : "#5A6B78"}
+          color={isFocused ? "#D4AF37" : "#8A9BA8"}
         />
         <Text
           style={{
-            fontSize: isFocused ? 10.5 : 10,
+            fontSize: isFocused ? 11.5 : 11,
             marginTop: 2,
             fontWeight: isFocused ? "700" : "500",
-            color: isFocused ? "#D4AF37" : "#5A6B78",
+            color: isFocused ? "#D4AF37" : "#8A9BA8",
             letterSpacing: 0.2,
           }}
         >

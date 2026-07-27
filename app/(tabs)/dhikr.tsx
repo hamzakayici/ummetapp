@@ -11,7 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useDhikrStore, useSharedDhikrStore } from "../../src/stores/appStore";
-import { supabase } from "../../src/services/supabase";
+import { api } from "../../src/services/api";
 import { getSharedDhikrByCode, createSharedDhikr } from "../../src/services/sharedDhikr";
 import { getRemoteConfigCached } from "../../src/services/remoteConfig";
 import { analyticsTrack } from "../../src/services/analytics";
@@ -83,24 +83,23 @@ export default function DhikrScreen() {
       true
     );
 
-    const room = supabase.channel('dhikr_room', {
-      config: { presence: { key: Math.random().toString(36).substr(2, 9) } },
-    });
+    // Eskiden Supabase Realtime "presence" ile canlı sayılıyordu. Yeni backend
+    // paylaşımlı hostingde kalıcı WebSocket tutamadığı için sunucudan periyodik
+    // olarak "son 5 dakikada aktif cihaz" sayısını çekiyoruz.
+    let cancelled = false;
 
-    room
-      .on('presence', { event: 'sync' }, () => {
-        const newState = room.presenceState();
-        let count = 0;
-        for (const id in newState) { count += newState[id].length; }
-        setLiveUsers(Math.max(count, 1));
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await room.track({ online_at: new Date().toISOString() });
-        }
-      });
+    const fetchOnline = async () => {
+      const { data } = await api.get<{ data: { online: number } }>("/stats/online");
+      if (!cancelled && data?.data) setLiveUsers(Math.max(1, data.data.online));
+    };
 
-    return () => { supabase.removeChannel(room); };
+    fetchOnline();
+    const onlineTimer = setInterval(fetchOnline, 30000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(onlineTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -275,14 +274,14 @@ export default function DhikrScreen() {
               onPress={() => setActiveTab("personal")}
               activeOpacity={0.8}
             >
-              <Text style={{ color: activeTab === "personal" ? "#ECDFCC" : "#5A6B78", fontWeight: "600", fontSize: 13 }}>Kişisel Zikir</Text>
+              <Text style={{ color: activeTab === "personal" ? "#ECDFCC" : "#8A9BA8", fontWeight: "600", fontSize: 13 }}>Kişisel Zikir</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={{ flex: 1, paddingVertical: 10, alignItems: "center", borderRadius: 10, backgroundColor: activeTab === "shared" ? "#1B4332" : "transparent" }}
               onPress={() => setActiveTab("shared")}
               activeOpacity={0.8}
             >
-              <Text style={{ color: activeTab === "shared" ? "#ECDFCC" : "#5A6B78", fontWeight: "600", fontSize: 13 }}>Ortak Hatim & Zikir</Text>
+              <Text style={{ color: activeTab === "shared" ? "#ECDFCC" : "#8A9BA8", fontWeight: "600", fontSize: 13 }}>Ortak Hatim & Zikir</Text>
             </TouchableOpacity>
           </View>
 
@@ -313,7 +312,7 @@ export default function DhikrScreen() {
                     borderColor: selectedPreset === i ? `${p.color}60` : "rgba(27,67,50,0.15)",
                     backgroundColor: selectedPreset === i ? `${p.color}12` : "rgba(18,26,36,0.5)",
                   }}>
-                    <Text style={{ color: selectedPreset === i ? p.color : "#5A6B78", fontSize: 12, fontWeight: "600" }}>{p.name}</Text>
+                    <Text style={{ color: selectedPreset === i ? p.color : "#8A9BA8", fontSize: 12, fontWeight: "600" }}>{p.name}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -327,11 +326,30 @@ export default function DhikrScreen() {
             </Text>
           </Animated.View>
 
-          {/* Counter - Tıklanabilir büyük daire */}
+          {/*
+            Counter — dokunma alanı daireden BÜYÜK.
+
+            Zikir çeken kişi ekrana bakmaz: göz kapalı, parmak refleksle iner.
+            Sadece daire tıklanabilir olsaydı, dairenin dışına denk gelen her
+            dokunuş kaybolmuş bir sayı olurdu. Bu yüzden dokunma alanı dairenin
+            çevresine geniş bir tampon bırakacak şekilde genişletildi.
+
+            Görsel daire aynı boyutta kalıyor — sadece basılabilir alan büyük.
+          */}
           <View style={{ alignItems: "center", marginTop: 20 }}>
             <Animated.View entering={FadeInDown.delay(300).springify()}>
               <Animated.View style={buttonStyle}>
-                <TouchableOpacity onPress={handleCount} activeOpacity={0.85} style={{ width: CIRCLE_SIZE, height: CIRCLE_SIZE, alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={handleCount}
+                  activeOpacity={0.85}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${preset.name} zikri. ${count} / ${target}. Saymak için dokunun.`}
+                  // Yönlere göre ayarlı: üstte preset çipleri var (20pt boşluk),
+                  // oraya taşarsak onların dokunuşlarını çalarız. Yanlarda ve
+                  // altta engel yok — orada cömert davranabiliriz.
+                  hitSlop={{ top: 14, bottom: 44, left: 44, right: 44 }}
+                  style={{ width: CIRCLE_SIZE, height: CIRCLE_SIZE, alignItems: "center", justifyContent: "center" }}
+                >
                   {/* Ripple Effect Layer */}
                   <Animated.View style={[{
                     position: "absolute",
@@ -354,7 +372,7 @@ export default function DhikrScreen() {
                   <View style={{ alignItems: "center" }}>
                     <Text style={{ color: preset.color, fontSize: 14, fontWeight: "600", opacity: 0.7 }}>{preset.name}</Text>
                     <Text style={{ color: isComplete ? "#40C057" : "#ECDFCC", fontSize: 58, fontWeight: "800", lineHeight: 68 }}>{count}</Text>
-                    <Text style={{ color: "#5A6B78", fontSize: 14, fontWeight: "500" }}>/ {target}</Text>
+                    <Text style={{ color: "#8A9BA8", fontSize: 14, fontWeight: "500" }}>/ {target}</Text>
                     {isComplete && (
                       <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
                         <Ionicons name="checkmark-circle" size={16} color="#40C057" />
@@ -373,25 +391,25 @@ export default function DhikrScreen() {
 
             <View style={{ flexDirection: "row", marginTop: 16, gap: 20 }}>
               <View style={{ alignItems: "center" }}>
-                <Text style={{ color: "#5A6B78", fontSize: 11, fontWeight: "500" }}>İlerleme</Text>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "500" }}>İlerleme</Text>
                 <Text style={{ color: preset.color, fontSize: 18, fontWeight: "700" }}>%{progress.toFixed(0)}</Text>
               </View>
               <View style={{ width: 1, height: 30, backgroundColor: "rgba(27,67,50,0.2)" }} />
               <View style={{ alignItems: "center" }}>
-                <Text style={{ color: "#5A6B78", fontSize: 11, fontWeight: "500" }}>Kalan</Text>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "500" }}>Kalan</Text>
                 <Text style={{ color: "#ECDFCC", fontSize: 18, fontWeight: "700" }}>{Math.max(target - count, 0)}</Text>
               </View>
               <View style={{ width: 1, height: 30, backgroundColor: "rgba(27,67,50,0.2)" }} />
               <View style={{ alignItems: "center" }}>
-                <Text style={{ color: "#5A6B78", fontSize: 11, fontWeight: "500" }}>Bugün</Text>
+                <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "500" }}>Bugün</Text>
                 <Text style={{ color: "#ECDFCC", fontSize: 18, fontWeight: "700" }}>{totalToday}</Text>
               </View>
             </View>
 
             <TouchableOpacity onPress={handleReset} style={{ marginTop: 20 }} activeOpacity={0.7}>
-              <View style={{ paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: "rgba(243,87,87,0.2)", backgroundColor: "rgba(243,87,87,0.05)", flexDirection: "row", alignItems: "center" }}>
-                <Ionicons name="refresh" size={14} color="#F35757" />
-                <Text style={{ color: "#F35757", fontSize: 13, fontWeight: "600", marginLeft: 6 }}>Sıfırla</Text>
+              <View style={{ paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.04)", flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="refresh" size={14} color="#8A9BA8" />
+                <Text style={{ color: "#8A9BA8", fontSize: 13, fontWeight: "600", marginLeft: 6 }}>Sıfırla</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -408,7 +426,7 @@ export default function DhikrScreen() {
               <TextInput
                 style={{ flex: 1, backgroundColor: "#0A0F14", borderRadius: 10, borderWidth: 1, borderColor: "#233345", color: "#ECDFCC", paddingHorizontal: 16, height: 48, fontSize: 15, fontFamily: "Inter_600SemiBold", textTransform: "uppercase" }}
                 placeholder="Örn: A7X9Z2"
-                placeholderTextColor="#5A6B78"
+                placeholderTextColor="#8A9BA8"
                 autoCapitalize="characters"
                 maxLength={6}
                 value={joinCode}
@@ -433,21 +451,21 @@ export default function DhikrScreen() {
             <View style={{ gap: 12 }}>
               <View style={{ flexDirection: "row", gap: 12 }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ color: "#5A6B78", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Kampanya Başlığı</Text>
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Kampanya Başlığı</Text>
                   <TextInput
                     style={{ backgroundColor: "#0A0F14", borderRadius: 10, borderWidth: 1, borderColor: "#233345", color: "#ECDFCC", paddingHorizontal: 16, height: 48, fontSize: 15 }}
                     placeholder="Örn: Filistin için Salavat"
-                    placeholderTextColor="#5A6B78"
+                    placeholderTextColor="#8A9BA8"
                     value={createTitle}
                     onChangeText={setCreateTitle}
                   />
                 </View>
                 <View style={{ width: 100 }}>
-                  <Text style={{ color: "#5A6B78", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Hedef Sayı</Text>
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Hedef Sayı</Text>
                   <TextInput
                     style={{ backgroundColor: "#0A0F14", borderRadius: 10, borderWidth: 1, borderColor: "#233345", color: "#ECDFCC", paddingHorizontal: 16, height: 48, fontSize: 15 }}
                     placeholder="70000"
-                    placeholderTextColor="#5A6B78"
+                    placeholderTextColor="#8A9BA8"
                     keyboardType="number-pad"
                     value={createTarget}
                     onChangeText={setCreateTarget}
@@ -456,7 +474,7 @@ export default function DhikrScreen() {
               </View>
 
               <View>
-                 <Text style={{ color: "#5A6B78", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Zikir Türü Seçin</Text>
+                 <Text style={{ color: "#8A9BA8", fontSize: 12, fontWeight: "600", marginBottom: 6, marginLeft: 2 }}>Zikir Türü Seçin</Text>
                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                    {SHARED_PRESETS.map((p, i) => (
                      <TouchableOpacity 
@@ -470,7 +488,7 @@ export default function DhikrScreen() {
                          backgroundColor: createPresetIndex === i ? `${p.color}12` : "rgba(18,26,36,0.5)",
                        }}
                      >
-                       <Text style={{ color: createPresetIndex === i ? p.color : "#5A6B78", fontSize: 12, fontWeight: "600" }}>{p.name}</Text>
+                       <Text style={{ color: createPresetIndex === i ? p.color : "#8A9BA8", fontSize: 12, fontWeight: "600" }}>{p.name}</Text>
                      </TouchableOpacity>
                    ))}
                  </ScrollView>
@@ -509,7 +527,7 @@ export default function DhikrScreen() {
                         <Text style={{ color: "#40C057", fontSize: 12, fontWeight: "600" }}>Benim Katkım: {item.myContribution}</Text>
                       </View>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#5A6B78" />
+                    <Ionicons name="chevron-forward" size={20} color="#8A9BA8" />
                   </TouchableOpacity>
                 ))}
               </View>

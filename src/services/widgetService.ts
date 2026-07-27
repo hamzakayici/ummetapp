@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
 import { getDailyVerse } from "../data/dailyVerses";
 import type { PrayerTimeEntry } from "./prayerTimes";
+import { captureError } from "./errorTracking";
 
 let WidgetData: {
   setItem: (key: string, value: string) => Promise<void>;
@@ -11,7 +12,8 @@ let WidgetData: {
 if (Platform.OS === "ios") {
   try {
     WidgetData = require("../../modules/widget-data").default;
-  } catch {
+  } catch (e) {
+    captureError("widget:update", e);
     // Widget modülü yüklenemedi — simulator veya eski iOS olabilir
   }
 }

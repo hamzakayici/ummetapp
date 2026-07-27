@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { supabase } from "./supabase";
+import { api } from "./api";
+import { getAnalyticsDeviceId } from "./analytics";
 
 export type RemoteConfig = Record<string, string>;
 
@@ -55,16 +56,11 @@ export async function refreshRemoteConfig({ ttlMs = DEFAULT_TTL_MS, force = fals
   const last = await readTs(RC_CACHE_TS_KEY);
   if (!force && last && Date.now() - last < ttlMs) return;
 
-  const { data, error } = await supabase.from("app_settings").select("key,value");
-  if (error) return;
+  const { data, error } = await api.get<{ data: RemoteConfig }>("/settings");
+  if (error || !data?.data) return;
 
-  const rc: RemoteConfig = {};
-  for (const row of data ?? []) {
-    if (row?.key) rc[String(row.key)] = String(row.value ?? "");
-  }
-
-  memoryRC = rc;
-  await writeJSON(RC_CACHE_KEY, rc);
+  memoryRC = data.data;
+  await writeJSON(RC_CACHE_KEY, memoryRC);
   await writeTs(RC_CACHE_TS_KEY, Date.now());
 }
 
@@ -81,25 +77,31 @@ export async function refreshAnnouncements(
   const last = await readTs(ANN_CACHE_TS_KEY);
   if (!force && last && Date.now() - last < ttlMs) return;
 
-  // RLS policy already filters only active
-  const { data, error } = await supabase
-    .from("announcements")
-    .select("id,title,content,type")
-    .order("created_at", { ascending: false })
-    .limit(Math.max(1, Math.min(50, Number(limit) || 5)));
+  // Sunucu yalnızca yayında olan duyuruları döndürür
+  const { data, error } = await api.get<{ data: Array<Record<string, unknown>> }>("/announcements");
+  if (error || !data?.data) return;
 
-  if (error) return;
-
-  const list: Announcement[] =
-    (data ?? []).map((r: any) => ({
-      id: String(r.id),
-      title: String(r.title ?? ""),
-      content: r.content ?? null,
-      type: r.type ?? "info",
-    })) ?? [];
+  const list: Announcement[] = data.data.slice(0, Math.max(1, Math.min(50, Number(limit) || 5))).map((r) => ({
+    id: String(r.id),
+    title: String(r.title ?? ""),
+    content: (r.content as string | null) ?? null,
+    type: (r.type as string) ?? "info",
+  }));
 
   memoryAnn = list;
   await writeJSON(ANN_CACHE_KEY, list);
   await writeTs(ANN_CACHE_TS_KEY, Date.now());
 }
 
+
+/**
+ * Duyuru görüntülendi — panelde açılma oranı metriği için.
+ *
+ * `device_id` gönderiyoruz: sunucu cihaz başına günde bir sayıyor. Bu olmadan
+ * uygulamayı gün içinde defalarca açan kullanıcı sayacı şişirir ve açılma oranı
+ * %100'ü aşar.
+ */
+export async function trackAnnouncementOpened(id: string) {
+  const device_id = await getAnalyticsDeviceId();
+  void api.post(`/announcements/${encodeURIComponent(id)}/opened`, { device_id });
+}

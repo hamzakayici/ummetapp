@@ -33,7 +33,7 @@ import {
   type PrayerTimeEntry,
 } from "../../src/services/prayerTimes";
 import { playEzan, stopEzan, isEzanPlaying } from "../../src/services/audioService";
-import { scheduleAllNotifications, sendImmediateNotifications } from "../../src/services/ezanNotification";
+import { syncPrayerNotifications, sendImmediateNotifications } from "../../src/services/ezanNotification";
 import { useSettingsStore, useWeeklyStore } from "../../src/stores/appStore";
 import { getDailyVerse } from "../../src/data/dailyVerses";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -41,6 +41,7 @@ import { updateWidgetData } from "../../src/services/widgetService";
 import { toHijri } from "../../src/utils/hijriCalendar";
 import { hapticImpact, hapticNotification, ImpactFeedbackStyle, NotificationFeedbackType } from "../../src/utils/haptics";
 import SunArcCard from "../../src/components/SunArcCard";
+import { getWeekKeys, getTodayWeekIndex } from "../../src/utils/dateKey";
 
 const { width } = Dimensions.get("window");
 const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 85 : 65;
@@ -161,8 +162,7 @@ export default function HomeScreen() {
       // Koordinatları cache'le (SunArcCard önceki/sonraki gün için kullanır)
       AsyncStorage.setItem("@ummet_prayer_coords", JSON.stringify({ lat: latitude, lon: longitude })).catch(() => {});
 
-      const { notificationsEnabled } = useSettingsStore.getState();
-      await scheduleAllNotifications(latitude, longitude, data, notificationsEnabled);
+      await syncPrayerNotifications(data);
 
       const firstRunKey = "@ummet_notif_first_run";
       const hasRun = await AsyncStorage.getItem(firstRunKey);
@@ -204,16 +204,11 @@ export default function HomeScreen() {
     }
   };
 
-  // Haftalık tracker — gerçek veri
+  // Haftalık tracker — gerçek veri.
+  // Tarih anahtarları YEREL saatle üretilir (utils/dateKey), UTC ile değil.
   const trackerDays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
-  const today = new Date();
-  const todayIdx = today.getDay() === 0 ? 6 : today.getDay() - 1;
-  const trackerData = trackerDays.map((_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (todayIdx - i));
-    const key = d.toISOString().split("T")[0];
-    return weeklyStore.trackedDays?.[key] || false;
-  });
+  const todayIdx = getTodayWeekIndex();
+  const trackerData = getWeekKeys().map((key) => weeklyStore.trackedDays?.[key] || false);
   const completedCount = trackerData.filter(Boolean).length;
 
   return (
@@ -239,7 +234,7 @@ export default function HomeScreen() {
                       <MaterialCommunityIcons name={prayers[nextPrayer].iconName as any} size={20} color="#D4AF37" />
                     </View>
                     <View>
-                      <Text style={{ color: "#D4AF37", fontSize: 11, fontWeight: "600" }}>Sonraki Vakit</Text>
+                      <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "600" }}>Sonraki Vakit</Text>
                       <Text style={{ color: "#ECDFCC", fontSize: 18, fontWeight: "800" }}>{prayers[nextPrayer].nameTr}</Text>
                     </View>
                   </>
@@ -248,11 +243,11 @@ export default function HomeScreen() {
               <View style={{ alignItems: "flex-end" }}>
                 <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(27,67,50,0.3)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 }}>
                   <Ionicons name="location-sharp" size={11} color="#D4AF37" />
-                  <Text style={{ color: "#8A9BA8", fontSize: 11, marginLeft: 4, maxWidth: 110 }} numberOfLines={1}>{locationName}</Text>
+                  <Text style={{ color: "#8A9BA8", fontSize: 12, marginLeft: 4, maxWidth: 110 }} numberOfLines={1}>{locationName}</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                   <MaterialCommunityIcons name="moon-waning-crescent" size={11} color="#A78BFA" />
-                  <Text style={{ color: "#A78BFA", fontSize: 10, marginLeft: 3, fontWeight: "500" }}>{hijri.formatted}</Text>
+                  <Text style={{ color: "#A78BFA", fontSize: 12, marginLeft: 3, fontWeight: "500" }}>{hijri.formatted}</Text>
                 </View>
               </View>
             </View>
@@ -278,7 +273,7 @@ export default function HomeScreen() {
               <MaterialCommunityIcons name="book-open-variant" size={14} color="#D4AF37" />
               <Text style={{ color: "#D4AF37", fontSize: 12, fontWeight: "700", marginLeft: 6 }}>Günün Ayeti</Text>
               <View style={{ flex: 1 }} />
-              <Text style={{ color: "#5A6B78", fontSize: 10 }}>{verse.surah} {verse.reference}</Text>
+              <Text style={{ color: "#8A9BA8", fontSize: 12 }}>{verse.surah} {verse.reference}</Text>
             </View>
             <Text style={{ color: "#ECDFCC", fontSize: 18, textAlign: "right", lineHeight: 30, fontFamily: "Amiri_400Regular" }}>
               {verse.arabic}
@@ -307,7 +302,7 @@ export default function HomeScreen() {
                 <View style={{ flexDirection: "row", gap: 4 }}>
                   {trackerDays.map((day, i) => (
                     <View key={day} style={{ flex: 1, alignItems: "center" }}>
-                      <Text style={{ color: "#5A6B78", fontSize: 9, fontWeight: "600", marginBottom: 4 }}>{day}</Text>
+                      <Text style={{ color: "#8A9BA8", fontSize: 11, fontWeight: "600", marginBottom: 4 }}>{day}</Text>
                       <View style={{
                         width: 28, height: 28, borderRadius: 8,
                         alignItems: "center", justifyContent: "center",
@@ -318,7 +313,7 @@ export default function HomeScreen() {
                         <Ionicons
                           name={trackerData[i] ? "checkmark" : i <= todayIdx ? "close" : "ellipse-outline"}
                           size={13}
-                          color={trackerData[i] ? "#40C057" : i < todayIdx ? "#E53935" : "#5A6B78"}
+                          color={trackerData[i] ? "#40C057" : i < todayIdx ? "#E53935" : "#8A9BA8"}
                         />
                       </View>
                     </View>
@@ -326,7 +321,7 @@ export default function HomeScreen() {
                 </View>
               </View>
               {/* Sağ OK */}
-              <Ionicons name="chevron-forward" size={18} color="#5A6B78" style={{ marginLeft: 8 }} />
+              <Ionicons name="chevron-forward" size={18} color="#8A9BA8" style={{ marginLeft: 8 }} />
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -362,7 +357,7 @@ export default function HomeScreen() {
                 <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: action.bg, alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
                   <MaterialCommunityIcons name={action.icon} size={22} color={action.color} />
                 </View>
-                <Text style={{ color: "#ECDFCC", fontSize: 11, fontWeight: "600" }}>{action.label}</Text>
+                <Text style={{ color: "#ECDFCC", fontSize: 12, fontWeight: "600" }}>{action.label}</Text>
               </TouchableOpacity>
             ))}
           </View>

@@ -1,18 +1,31 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 import {
   fetchPrayerTimes,
   type PrayerTimeEntry,
 } from "./prayerTimes";
 import { getDailyVerse } from "../data/dailyVerses";
+import { channelIdFor, GENERAL_CHANNEL_ID, DAILY_VERSE_CHANNEL_ID, setupNotificationChannels } from "./notificationChannels";
+import { Platform } from "react-native";
+import { captureError } from "./errorTracking";
 
-// Bildirim handler ayarla — uygulama foreground'dayken de göster + sesi çal
+// Bildirim handler — ezan kapalıysa ezan bildiriminin sesini çalma
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
+  handleNotification: async (notification) => {
+    const data = notification.request.content.data;
+    const isEzan = data?.type === "ezan" || data?.type === "ezan_test";
+    let ezanEnabled = true;
+    if (isEzan) {
+      const { useSettingsStore } = await import("../stores/appStore");
+      ezanEnabled = useSettingsStore.getState().notificationsEnabled;
+    }
+    return {
+      shouldPlaySound: !isEzan || ezanEnabled,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    };
+  },
 });
 
 // Namaz vakti → ezan bildirim eşleştirmesi (custom sound)
@@ -79,19 +92,22 @@ export async function scheduleEzanNotifications(
         content: {
           title: notifInfo.title,
           body: notifInfo.body,
-          sound: notifInfo.sound,
+          // iOS sesi bildirimden alır; Android sesi KANALDAN alır (bkz. notificationChannels.ts)
+          sound: Platform.OS === "ios" ? notifInfo.sound : undefined,
           data: { type: "ezan", prayerName: prayer.name },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
           hour: hours,
           minute: minutes,
+          channelId: channelIdFor(prayer.name),
         },
       });
       scheduled++;
     }
     return scheduled;
-  } catch {
+  } catch (e) {
+    captureError("ezanNotification:schedule", e);
     return 0;
   }
 }
@@ -122,6 +138,7 @@ export async function schedulePrayerTimesLockscreen(
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: 5,
       minute: 0,
+      channelId: GENERAL_CHANNEL_ID,
     },
   });
 }
@@ -147,6 +164,7 @@ export async function scheduleDailyVerseNotification(): Promise<void> {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: 7,
       minute: 0,
+      channelId: DAILY_VERSE_CHANNEL_ID,
     },
   });
 }
@@ -171,6 +189,7 @@ export async function scheduleFridayKehfNotification(): Promise<void> {
       weekday: 6, // 1: Sunday, 2: Monday... 6: Friday 
       hour: 10,
       minute: 0,
+      channelId: GENERAL_CHANNEL_ID,
     },
   });
 }
@@ -194,8 +213,55 @@ export async function scheduleStreakReminderNotification(): Promise<void> {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: 21,
       minute: 0,
+      channelId: GENERAL_CHANNEL_ID,
     },
   });
+}
+
+/**
+ * Ayarlara göre bildirimleri senkronize et.
+ * Ezan kapatıldığında OS'teki zamanlanmış ezan bildirimlerini hemen iptal eder.
+ */
+export async function syncPrayerNotifications(
+  prayers?: PrayerTimeEntry[],
+): Promise<void> {
+  const { useSettingsStore } = await import("../stores/appStore");
+  const { notificationsEnabled, calculationMethod } = useSettingsStore.getState();
+
+  const coordsRaw = await AsyncStorage.getItem("@ummet_prayer_coords");
+  if (!coordsRaw) {
+    if (!notificationsEnabled) {
+      await cancelAllNotifications();
+    }
+    return;
+  }
+
+  let latitude: number;
+  let longitude: number;
+  try {
+    const parsed = JSON.parse(coordsRaw) as { lat?: number; lon?: number };
+    if (typeof parsed.lat !== "number" || typeof parsed.lon !== "number") {
+      if (!notificationsEnabled) await cancelAllNotifications();
+      return;
+    }
+    latitude = parsed.lat;
+    longitude = parsed.lon;
+  } catch {
+    if (!notificationsEnabled) await cancelAllNotifications();
+    return;
+  }
+
+  let prayerList = prayers;
+  if (!prayerList?.length) {
+    try {
+      prayerList = await fetchPrayerTimes(latitude, longitude, 0, calculationMethod);
+    } catch {
+      if (!notificationsEnabled) await cancelAllNotifications();
+      return;
+    }
+  }
+
+  await scheduleAllNotifications(latitude, longitude, prayerList, notificationsEnabled);
 }
 
 /**
@@ -263,7 +329,7 @@ export async function sendImmediateNotifications(prayers: PrayerTimeEntry[]): Pr
       sound: false,
       data: { type: "prayer_times" },
     },
-    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 2, repeats: false },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 2, repeats: false, channelId: DAILY_VERSE_CHANNEL_ID },
   });
 
   // Akıllı Bildirim Demo — 5 saniye sonra
@@ -275,7 +341,7 @@ export async function sendImmediateNotifications(prayers: PrayerTimeEntry[]): Pr
       color: "#D4AF37",
       data: { type: "streak_reminder" },
     },
-    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, repeats: false },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, repeats: false, channelId: DAILY_VERSE_CHANNEL_ID },
   });
 }
 

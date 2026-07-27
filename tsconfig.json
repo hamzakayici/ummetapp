@@ -31,11 +31,19 @@
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "modules/**/*.ts",
+    "index.ts",
     "nativewind-env.d.ts"
   ],
   "exclude": [
-    "supabase/functions/**"
+    "node_modules",
+    "supabase/functions/**",
+    "landing/**",
+    "web/**",
+    "dist/**"
   ]
 }
