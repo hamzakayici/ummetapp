@@ -47,3 +47,6 @@ data/appstore/
 
 # Claude Code yerel ayarları (izin listesi vb.)
 .claude/
+
+# Kaldırılan Next.js projesi (dev sunucusu artık yeniden oluşturmasın)
+landing/
